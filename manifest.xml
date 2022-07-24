@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<PluginManifest xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <Name>ALE-ConnectionLog</Name>
+  <Guid>dc628a41-2842-4b99-bb4e-4be3bd9f8988</Guid>
+  <Repository>None</Repository>
+  <Version>v1.0.0.0</Version>
+</PluginManifest>

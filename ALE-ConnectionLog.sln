@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.32106.194
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ALE-ConnectionLog", "ALE-ConnectionLog.csproj", "{C18D82BB-92D1-4B5B-A6BC-DDE29EC20851}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "ALE-Core", "..\ALE-Core\ALE-Core.shproj", "{6692DDE3-BD7D-4239-9230-FDD834526DB2}"
+EndProject
+Global
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		..\ALE-Core\ALE-Core.projitems*{6692dde3-bd7d-4239-9230-fdd834526db2}*SharedItemsImports = 13
+		ALE-Core\ALE-Core.projitems*{c18d82bb-92d1-4b5b-a6bc-dde29ec20851}*SharedItemsImports = 4
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C18D82BB-92D1-4B5B-A6BC-DDE29EC20851}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C18D82BB-92D1-4B5B-A6BC-DDE29EC20851}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C18D82BB-92D1-4B5B-A6BC-DDE29EC20851}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C18D82BB-92D1-4B5B-A6BC-DDE29EC20851}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {661A17E3-61F0-44D8-B9BA-602EA35C333C}
+	EndGlobalSection
+EndGlobal
