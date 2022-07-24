@@ -1,8 +1,9 @@
 
+ALE-Core/
 GameBinaries/
 TorchBinaries/
-Build/
 bin/
+Build/
 obj/
 .svn/
 .git/
