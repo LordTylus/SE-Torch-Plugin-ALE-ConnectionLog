@@ -17,10 +17,18 @@ namespace ALE_ConnectionLog {
         public ConnectionLogPlugin Plugin => (ConnectionLogPlugin)Context.Plugin;
 
         [Command("save", "Saves the log immediately")]
-        [Permission(MyPromoteLevel.Moderator)]
+        [Permission(MyPromoteLevel.Admin)]
         public void Save() {
             Plugin.SaveLogEntriesAsync();
             Context.Respond("Log saved!");
+        }
+
+
+        [Command("logoutall", "Logs all Players out.")]
+        [Permission(MyPromoteLevel.Owner)]
+        public void LogoutAll() {
+            Plugin.LogEveryoneOut();
+            Context.Respond("Done!");
         }
 
         [Command("playtime", "Outputs the total Playtimes of the specified player.")]
@@ -142,6 +150,9 @@ namespace ALE_ConnectionLog {
                     else
                         sb.AppendLine("Grids: " + entry.Login.GridCount);
                 }
+
+                if(entry.LogoutThroughSessionUnload)
+                    sb.AppendLine("Logged off through Serverrestart");
 
                 sb.AppendLine();
             }

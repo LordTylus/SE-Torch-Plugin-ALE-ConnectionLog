@@ -1,6 +1,7 @@
 ﻿using ALE_ConnectionLog.model;
 using ALE_ConnectionLog.serialize;
 using NLog;
+using Sandbox.Game;
 using Sandbox.Game.World;
 using Sandbox.ModAPI;
 using System;
@@ -136,6 +137,10 @@ namespace ALE_ConnectionLog {
             }
         }
 
+        private void PlayerConnected(long playerId) {
+            throw new NotImplementedException();
+        }
+
         private void PlayerJoined(IPlayer obj) {
 
             ulong SteamId = obj.SteamId;
@@ -160,7 +165,7 @@ namespace ALE_ConnectionLog {
             Log.Info(obj.Name + " left.");
         }
 
-        private void LogEveryoneOut() {
+        internal void LogEveryoneOut() {
             
             var result = new List<MyPlayer>(MySession.Static.Players.GetOnlinePlayers()
                 .Where(x => x.IsRealPlayer && !string.IsNullOrEmpty(x.DisplayName)));

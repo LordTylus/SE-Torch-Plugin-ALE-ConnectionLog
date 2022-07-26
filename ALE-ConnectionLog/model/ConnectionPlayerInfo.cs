@@ -41,11 +41,17 @@ namespace ALE_ConnectionLog.model {
             if (entry == null)
                 return;
 
-            if (entry.Login != null)
-                TotalPlayTime += (long) (DateTime.Now - entry.Login.SnapshotTime).TotalSeconds;
-
             var snapshot = PlayerSnapshotFactory.Create(SteamId);
 
+            if (entry.Login != null) {
+
+                /* If logout it called twice make sure to fix the numbers */
+                if (entry.Logout != null)
+                    TotalPlayTime -= (long)(entry.Logout.SnapshotTime - entry.Login.SnapshotTime).TotalSeconds;
+
+                TotalPlayTime += (long)(snapshot.SnapshotTime - entry.Login.SnapshotTime).TotalSeconds;
+            }
+                
             entry.SetLogout(snapshot, sessionUnloading);
         }
 
