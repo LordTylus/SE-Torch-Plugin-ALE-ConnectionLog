@@ -8,8 +8,8 @@ using Torch;
 namespace ALE_ConnectionLog.serialize {
     public class CpiDto : ViewModel {
         public ulong SID { get; set; }
-        public long TPT { get; set; }
-        public DateTime LS { get; set; }
+        public long TPT { get; set; } = 0;
+        public DateTime LS { get; set; } = DateTime.Now;
 
         private HashSet<string> _allKnownNames = new HashSet<string>();
         private List<CeDto> _connectionEntries = new List<CeDto>();
