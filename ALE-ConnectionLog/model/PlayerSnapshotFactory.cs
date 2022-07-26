@@ -1,5 +1,6 @@
 ﻿using ALE_Core.Utils;
 using Sandbox.Game.World;
+using System;
 
 namespace ALE_ConnectionLog.model {
     
@@ -18,6 +19,22 @@ namespace ALE_ConnectionLog.model {
             int GridCount = Identity.BlockLimits.BlocksBuiltByGrid.Count;
 
             string FactionTag = FactionUtils.GetPlayerFactionTag(IdentityID);
+
+            return new PlayerSnapshot(IdentityID, PCU, Blocks, GridCount, FactionTag);
+        }
+
+        internal static PlayerSnapshot Create(PlayerSnapshot login) {
+
+            if (login == null)
+                return null;
+
+            long IdentityID = login.IdentityId;
+
+            int PCU = login.PCU;
+            int Blocks = login.BlockCount;
+            int GridCount = login.GridCount;
+
+            string FactionTag = login.Faction;
 
             return new PlayerSnapshot(IdentityID, PCU, Blocks, GridCount, FactionTag);
         }

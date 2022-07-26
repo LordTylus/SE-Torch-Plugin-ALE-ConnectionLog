@@ -5,6 +5,8 @@ using VRage.Collections;
 namespace ALE_ConnectionLog.model {
     public class ConnectionPlayerInfo {
 
+        public static readonly Logger Log = LogManager.GetCurrentClassLogger();
+
         public ulong SteamId { get; }
         public DateTime LastSeen { get; set; }
         public long TotalPlayTime { get; set; }
@@ -40,6 +42,16 @@ namespace ALE_ConnectionLog.model {
                 return;
 
             var snapshot = PlayerSnapshotFactory.Create(SteamId);
+
+            if (snapshot == null) {
+
+                Log.Warn("Could not create logout Snapshot for " + SteamId + " close it manually!");
+
+                snapshot = PlayerSnapshotFactory.Create(entry.Login);
+            }
+
+            if (snapshot == null) 
+                Log.Error("Something is wrong in your file. Login for "+ SteamId + " should be set!");
 
             if (snapshot != null && entry.Login != null) {
 
