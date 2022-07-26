@@ -56,7 +56,8 @@ namespace ALE_ConnectionLog.model {
                     memorizedEntries.Add(playerInfo.SteamId, latestEntry);
             }
 
-            Log.Warn("Found " + memorizedEntries.Count + " unclosed sessions!");
+            if (memorizedEntries.Count > 0)
+                Log.Warn("Found " + memorizedEntries.Count + " unclosed sessions!");
         }
 
         internal void CloseMemorizedSessions() {
@@ -71,7 +72,8 @@ namespace ALE_ConnectionLog.model {
                 playerInfo.ForceLogout(rememeredEntry, true);
             }
 
-            Log.Info(memorizedEntries.Count + " sessions closed.");
+            if(memorizedEntries.Count > 0)
+                Log.Info(memorizedEntries.Count + " sessions closed.");
 
             memorizedEntries.Clear();
         }
