@@ -49,7 +49,7 @@ namespace ALE_ConnectionLog.model {
             entry.SetLogout(snapshot, sessionUnloading);
         }
 
-        private ConnectionEntry GetLatestEntry() {
+        public ConnectionEntry GetLatestEntry() {
             return _connectionEntries.Count > 0 ? _connectionEntries[0] : null;
         }
 
@@ -134,6 +134,14 @@ namespace ALE_ConnectionLog.model {
                     return Logout.SnapshotTime;
 
                 return Login.SnapshotTime;
+            }
+
+            internal int GetDurationMinutes() {
+
+                if (Logout == null)
+                    return 0;
+
+                return (int) (Logout.SnapshotTime - Login.SnapshotTime).TotalMinutes;
             }
         }
     }
