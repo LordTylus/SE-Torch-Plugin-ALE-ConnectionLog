@@ -43,6 +43,8 @@ namespace ALE_ConnectionLog {
 
             StringBuilder sb = new StringBuilder();
 
+            AddLastSeenToSb(sb, playerParam.Value.SteamId);
+
             var connectionLog = Plugin.LogEntries;
             var playerInfo = connectionLog.GetInfoForPlayer(playerParam.Value.SteamId);
 
@@ -120,6 +122,8 @@ namespace ALE_ConnectionLog {
             var playerInfo = connectionLog.GetInfoForPlayer(playerParam.Value.SteamId);
 
             var config = Plugin.Config;
+
+            AddLastSeenToSb(sb, playerParam.Value.SteamId);
 
             foreach (var entry in playerInfo.GetEntries()) {
 
@@ -294,6 +298,19 @@ namespace ALE_ConnectionLog {
             }
 
             Respond(sb, "Potential Multiaccounts", "Shows who shared IPs and when");
+        }
+
+        private static void AddLastSeenToSb(StringBuilder sb, ulong steamId) {
+
+            long identityId = MySession.Static.Players.TryGetIdentityId(steamId);
+            var identity = MySession.Static.Players.TryGetIdentity(identityId);
+
+            if (identity == null)
+                return;
+
+            sb.AppendLine("Last Login: "+ identity.LastLoginTime.ToString("yyyy-MM-dd  HH:mm:ss"));
+            sb.AppendLine("Last Logout: " + identity.LastLoginTime.ToString("yyyy-MM-dd  HH:mm:ss"));
+            sb.AppendLine();
         }
 
         private static void AddPlayTimeToSb(StringBuilder sb, model.ConnectionPlayerInfo.ConnectionEntry entry) {
