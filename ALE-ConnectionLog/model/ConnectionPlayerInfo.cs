@@ -54,10 +54,14 @@ namespace ALE_ConnectionLog.model {
                 snapshot = PlayerSnapshotFactory.Create(entry.Login);
             }
 
-            if (snapshot == null) 
-                Log.Error("Something is wrong in your file. Login for "+ SteamId + " should be set!");
+            if (snapshot == null) {
 
-            if (snapshot != null && entry.Login != null) {
+                Log.Error("Something is wrong in your file. Login for " + SteamId + " should be set!");
+
+                snapshot = PlayerSnapshotFactory.CreateEmpty();
+            }
+
+            if (entry.Login != null) {
 
                 /* If logout it called twice make sure to fix the numbers */
                 if (entry.Logout != null)
