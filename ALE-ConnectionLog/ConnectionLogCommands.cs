@@ -23,7 +23,6 @@ namespace ALE_ConnectionLog {
             Context.Respond("Log saved!");
         }
 
-
         [Command("logoutall", "Logs all Players out.")]
         [Permission(MyPromoteLevel.Owner)]
         public void LogoutAll() {
@@ -35,13 +34,17 @@ namespace ALE_ConnectionLog {
         [Permission(MyPromoteLevel.Moderator)]
         public void PlayTime(string nameIdOrSteamId) {
 
-            MyIdentity identity = PlayerUtils.GetIdentityByNameOrId(nameIdOrSteamId);
-            ulong steamId = MySession.Static.Players.TryGetSteamId(identity.IdentityId);
+            PlayerParam? playerParam = FindPlayerParam(nameIdOrSteamId);
+
+            if(!playerParam.HasValue) {
+                Context.Respond("Player not found!");
+                return;
+            }
 
             StringBuilder sb = new StringBuilder();
 
             var connectionLog = Plugin.LogEntries;
-            var playerInfo = connectionLog.GetInfoForPlayer(steamId);
+            var playerInfo = connectionLog.GetInfoForPlayer(playerParam.Value.SteamId);
 
             sb.AppendLine("Total play time: " + (int) (playerInfo.TotalPlayTime/60) +" minutes.");
             sb.AppendLine();
@@ -50,38 +53,46 @@ namespace ALE_ConnectionLog {
                 AddPlayTimeToSb(sb, entry);
             }
 
-            Respond(sb, "Play Time", "Player " + identity.DisplayName);
+            Respond(sb, "Play Time", "Player " + playerParam.Value.Name);
         }
 
         [Command("ips", "Shows all known IPs of the Player.")]
         [Permission(MyPromoteLevel.Admin)]
         public void IPs(string nameIdOrSteamId) {
 
-            MyIdentity identity = PlayerUtils.GetIdentityByNameOrId(nameIdOrSteamId);
-            ulong steamId = MySession.Static.Players.TryGetSteamId(identity.IdentityId);
+            PlayerParam? playerParam = FindPlayerParam(nameIdOrSteamId);
+
+            if (!playerParam.HasValue) {
+                Context.Respond("Player not found!");
+                return;
+            }
 
             StringBuilder sb = new StringBuilder();
 
             var connectionLog = Plugin.LogEntries;
-            var playerInfo = connectionLog.GetInfoForPlayer(steamId);
+            var playerInfo = connectionLog.GetInfoForPlayer(playerParam.Value.SteamId);
 
             foreach (var entry in playerInfo.GetEntries())
                 sb.AppendLine(entry.Name + " " + entry.IP +" "+ entry.GetLastDateTime().ToString("yyyy-MM-dd  HH:mm:ss"));
 
-            Respond(sb, "IPs", "Player " + identity.DisplayName);
+            Respond(sb, "IPs", "Player " + playerParam.Value.Name);
         }
 
         [Command("names", "Outputs all known names of the selected Player.")]
         [Permission(MyPromoteLevel.Moderator)]
         public void Names(string nameIdOrSteamId) {
 
-            MyIdentity identity = PlayerUtils.GetIdentityByNameOrId(nameIdOrSteamId);
-            ulong steamId = MySession.Static.Players.TryGetSteamId(identity.IdentityId);
+            PlayerParam? playerParam = FindPlayerParam(nameIdOrSteamId);
+
+            if (!playerParam.HasValue) {
+                Context.Respond("Player not found!");
+                return;
+            }
 
             StringBuilder sb = new StringBuilder();
 
             var connectionLog = Plugin.LogEntries;
-            var playerInfo = connectionLog.GetInfoForPlayer(steamId);
+            var playerInfo = connectionLog.GetInfoForPlayer(playerParam.Value.SteamId);
 
             var names = new List<string>(playerInfo.GetNames());
             names.Sort();
@@ -89,20 +100,24 @@ namespace ALE_ConnectionLog {
             foreach(var name in names)
             sb.AppendLine("--> "+name);
 
-            Respond(sb, "Playernames", "All known names of Player " + identity.DisplayName);
+            Respond(sb, "Playernames", "All known names of Player " + playerParam.Value.Name);
         }
 
         [Command("sessions", "Outputs the sessions of the specified player.")]
         [Permission(MyPromoteLevel.Moderator)]
         public void Sessions(string nameIdOrSteamId) {
 
-            MyIdentity identity = PlayerUtils.GetIdentityByNameOrId(nameIdOrSteamId);
-            ulong steamId = MySession.Static.Players.TryGetSteamId(identity.IdentityId);
+            PlayerParam? playerParam = FindPlayerParam(nameIdOrSteamId);
+
+            if (!playerParam.HasValue) {
+                Context.Respond("Player not found!");
+                return;
+            }
 
             StringBuilder sb = new StringBuilder();
 
             var connectionLog = Plugin.LogEntries;
-            var playerInfo = connectionLog.GetInfoForPlayer(steamId);
+            var playerInfo = connectionLog.GetInfoForPlayer(playerParam.Value.SteamId);
 
             var config = Plugin.Config;
 
@@ -157,7 +172,7 @@ namespace ALE_ConnectionLog {
                 sb.AppendLine();
             }
 
-            Respond(sb, "Session", "Player " + identity.DisplayName);
+            Respond(sb, "Session", "Player " + playerParam.Value.Name);
         }
 
         [Command("find", "Looks for the Data of a specific player by namePattern.")]
@@ -327,6 +342,38 @@ namespace ALE_ConnectionLog {
 
                 ModCommunication.SendMessageTo(new DialogMessage(title,
                     subtitle, sb.ToString()), Context.Player.SteamUserId);
+            }
+        }
+
+        private PlayerParam? FindPlayerParam(string nameIdOrSteamId) {
+
+            MyIdentity identity = PlayerUtils.GetIdentityByNameOrId(nameIdOrSteamId);
+
+            ulong steamId;
+
+            if (identity != null) {
+
+                steamId = MySession.Static.Players.TryGetSteamId(identity.IdentityId);
+
+                return new PlayerParam(identity.DisplayName, steamId);
+            }
+
+            if (ulong.TryParse(nameIdOrSteamId, out steamId)) {
+
+                return new PlayerParam(steamId.ToString(), steamId);
+            }
+
+            return null;
+        }
+
+        private struct PlayerParam {
+            
+            public string Name;
+            public ulong SteamId;
+
+            public PlayerParam(string name, ulong steamId) {
+                Name = name;
+                SteamId = steamId;
             }
         }
     }
