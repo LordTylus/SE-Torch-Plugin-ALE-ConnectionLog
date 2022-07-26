@@ -45,6 +45,24 @@ namespace ALE_ConnectionLog {
             Respond(sb, "Play Time", "Player " + identity.DisplayName);
         }
 
+        [Command("ips", "Shows all known IPs of the Player.")]
+        [Permission(MyPromoteLevel.Admin)]
+        public void IPs(string nameIdOrSteamId) {
+
+            MyIdentity identity = PlayerUtils.GetIdentityByNameOrId(nameIdOrSteamId);
+            ulong steamId = MySession.Static.Players.TryGetSteamId(identity.IdentityId);
+
+            StringBuilder sb = new StringBuilder();
+
+            var connectionLog = Plugin.LogEntries;
+            var playerInfo = connectionLog.GetInfoForPlayer(steamId);
+
+            foreach (var entry in playerInfo.GetEntries())
+                sb.AppendLine(entry.Name + " " + entry.IP +" "+ entry.GetLastDateTime().ToString("yyyy-MM-dd  HH:mm:ss"));
+
+            Respond(sb, "IPs", "Player " + identity.DisplayName);
+        }
+
         [Command("names", "Outputs all known names of the selected Player.")]
         [Permission(MyPromoteLevel.Moderator)]
         public void Names(string nameIdOrSteamId) {
@@ -78,9 +96,15 @@ namespace ALE_ConnectionLog {
             var connectionLog = Plugin.LogEntries;
             var playerInfo = connectionLog.GetInfoForPlayer(steamId);
 
+            var config = Plugin.Config;
+
             foreach (var entry in playerInfo.GetEntries()) {
 
-                sb.AppendLine(entry.Name);
+                if(config.ShowIpInSessionsCommand)
+                    sb.AppendLine(entry.Name+" "+entry.IP);
+                else 
+                    sb.AppendLine(entry.Name);
+
                 AddPlayTimeToSb(sb, entry);
                 
                 if(entry.Logout == null) {
@@ -169,19 +193,23 @@ namespace ALE_ConnectionLog {
             Respond(sb, "Found Players", "Players whose name matches case insensitive");
         }
 
-        [Command("ips", "Outputs which Players had the same IP adress and when.")]
+        [Command("multis", "Outputs which Players had the same IP adress and when.")]
         [Permission(MyPromoteLevel.Admin)]
-        public void IPs() {
+        public void Multis(bool showMissingIPs = false) {
 
             StringBuilder sb = new StringBuilder();
 
             Dictionary<string, Dictionary<string, HashSet<ulong>>> ipToDateToSteamDict = new Dictionary<string, Dictionary<string, HashSet<ulong>>>();
 
             var connectionLog = Plugin.LogEntries;
+            var config = Plugin.Config;
 
             foreach (var playerInfo in connectionLog.GetPlayerInfos()) {
 
                 foreach(var entry in playerInfo.GetEntries()) {
+
+                    if (entry.IP == "0.0.0.0" && config.IgnoreMissingIpsForConflicts && !showMissingIPs)
+                        continue;
 
                     Dictionary<string, HashSet<ulong>> dateToNameDict;
 
@@ -239,7 +267,7 @@ namespace ALE_ConnectionLog {
                 }
             }
 
-            Respond(sb, "IP conflicts", "Shows who shared IPs and when");
+            Respond(sb, "Potential Multiaccounts", "Shows who shared IPs and when");
         }
 
         private static void AddPlayTimeToSb(StringBuilder sb, model.ConnectionPlayerInfo.ConnectionEntry entry) {

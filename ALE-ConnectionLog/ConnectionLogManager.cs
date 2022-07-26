@@ -1,24 +1,11 @@
 ﻿using ALE_ConnectionLog.model;
 using ALE_ConnectionLog.serialize;
 using NLog;
-using Sandbox.Game.World;
 using Sandbox.ModAPI;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Net;
-using System.Reflection;
-using System.Windows.Controls;
 using Torch;
-using Torch.API;
-using Torch.API.Managers;
-using Torch.API.Plugins;
-using Torch.API.Session;
-using Torch.Session;
-using VRage.GameServices;
-using VRage.Steam;
 using static ALE_ConnectionLog.model.ConnectionPlayerInfo;
 
 namespace ALE_ConnectionLog {

@@ -22,6 +22,8 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <TextBlock Grid.Column="0" Grid.Row ="0" VerticalAlignment="Center" Text="ALE-ConnectionLog" FontWeight="Bold" FontSize="16" Grid.ColumnSpan="2" Margin="5"/>
@@ -38,6 +40,12 @@
         <TextBlock Grid.Column="0" Grid.Row ="4" VerticalAlignment="Center" Text="Save IPs in Logs" Margin="5"/>
         <CheckBox Name="SaveIPs" Grid.Column="1" Grid.Row ="4" Grid.ColumnSpan="2" Margin="5" IsChecked="{Binding SaveIPs}"/>
 
-        <Button Grid.Column="2" Grid.Row="5" Content="Save Config" Margin="5" Click="SaveButton_OnClick"></Button>
+        <TextBlock Grid.Column="0" Grid.Row ="5" VerticalAlignment="Center" Text="Ignore 0.0.0.0 IPs when looking for multi accounts." Margin="5"/>
+        <CheckBox Name="IgnoreMissingIpsForConflicts" Grid.Column="1" Grid.Row ="5" Grid.ColumnSpan="2" Margin="5" IsChecked="{Binding IgnoreMissingIpsForConflicts}"/>
+
+        <TextBlock Grid.Column="0" Grid.Row ="6" VerticalAlignment="Center" Text="Show IP in session command too." Margin="5"/>
+        <CheckBox Name="ShowIpInSessionsCommand" Grid.Column="1" Grid.Row ="6" Grid.ColumnSpan="2" Margin="5" IsChecked="{Binding ShowIpInSessionsCommand}"/>
+
+        <Button Grid.Column="2" Grid.Row="7" Content="Save Config" Margin="5" Click="SaveButton_OnClick"></Button>
     </Grid>
 </UserControl>
