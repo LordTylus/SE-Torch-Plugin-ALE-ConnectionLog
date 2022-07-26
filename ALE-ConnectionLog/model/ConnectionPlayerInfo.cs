@@ -32,18 +32,16 @@ namespace ALE_ConnectionLog.model {
             _connectionEntries.Insert(0, entry);
         }
 
-        internal void Logout(bool sessionUnloading) {
-
+        internal void ForceLogout(ConnectionEntry entry, bool sessionUnloading) {
+            
             LastSeen = DateTime.Now;
-
-            ConnectionEntry entry = GetLatestEntry();
 
             if (entry == null)
                 return;
 
             var snapshot = PlayerSnapshotFactory.Create(SteamId);
 
-            if (entry.Login != null) {
+            if (snapshot != null && entry.Login != null) {
 
                 /* If logout it called twice make sure to fix the numbers */
                 if (entry.Logout != null)
@@ -51,8 +49,12 @@ namespace ALE_ConnectionLog.model {
 
                 TotalPlayTime += (long)(snapshot.SnapshotTime - entry.Login.SnapshotTime).TotalSeconds;
             }
-                
+
             entry.SetLogout(snapshot, sessionUnloading);
+        }
+
+        internal void Logout(bool sessionUnloading) {
+            ForceLogout(GetLatestEntry(), sessionUnloading);
         }
 
         public ConnectionEntry GetLatestEntry() {

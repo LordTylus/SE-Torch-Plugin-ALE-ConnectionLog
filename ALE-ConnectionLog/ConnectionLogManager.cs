@@ -38,7 +38,11 @@ namespace ALE_ConnectionLog {
             if (_logEntries?.Data == null)
                 return new ConnectionLog();
 
-            return Convert(_logEntries.Data);
+            var ConnectLog = Convert(_logEntries.Data);
+
+            ConnectLog.MemorizeNonClosedSessions();
+
+            return ConnectLog;
         }
 
         public void SaveLogEntriesAsync(ConnectionLog connectionLog, ConnectionLogConfig config) {

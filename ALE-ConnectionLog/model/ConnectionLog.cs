@@ -4,11 +4,15 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using Torch;
+using static ALE_ConnectionLog.model.ConnectionPlayerInfo;
 
 namespace ALE_ConnectionLog.model {
     public class ConnectionLog {
 
-        private Dictionary<ulong, ConnectionPlayerInfo> _playerInfos = new Dictionary<ulong, ConnectionPlayerInfo>();
+        public static readonly Logger Log = LogManager.GetCurrentClassLogger();
+
+        private readonly Dictionary<ulong, ConnectionPlayerInfo> _playerInfos = new Dictionary<ulong, ConnectionPlayerInfo>();
+        private readonly Dictionary<ulong, ConnectionEntry> memorizedEntries = new Dictionary<ulong, ConnectionEntry>();
 
         public IEnumerable<ConnectionPlayerInfo> GetPlayerInfos() {
             return _playerInfos.Values;
@@ -38,6 +42,38 @@ namespace ALE_ConnectionLog.model {
             playerInfo.Login(name, ip, config);
 
             UpdateInfoForPlayer(playerInfo);
+        }
+
+        internal void MemorizeNonClosedSessions() {
+
+            memorizedEntries.Clear();
+
+            foreach (var playerInfo in _playerInfos.Values) {
+
+                var latestEntry = playerInfo.GetLatestEntry();
+
+                if (latestEntry != null && latestEntry.Logout == null)
+                    memorizedEntries.Add(playerInfo.SteamId, latestEntry);
+            }
+
+            Log.Warn("Found " + memorizedEntries.Count + " unclosed sessions!");
+        }
+
+        internal void CloseMemorizedSessions() {
+
+            foreach (var entry in memorizedEntries) {
+
+                ulong steamId = entry.Key;
+
+                var playerInfo = GetInfoForPlayer(steamId);
+                var rememeredEntry = entry.Value;
+
+                playerInfo.ForceLogout(rememeredEntry, true);
+            }
+
+            Log.Info(memorizedEntries.Count + " sessions closed.");
+
+            memorizedEntries.Clear();
         }
 
         internal void LogoutPlayer(ulong steamId, bool sessionUnloading) {
