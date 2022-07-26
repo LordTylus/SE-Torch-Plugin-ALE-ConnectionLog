@@ -3,6 +3,7 @@ using Sandbox.Game.World;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.RegularExpressions;
 using Torch.Commands;
 using Torch.Commands.Permissions;
 using Torch.Mod;
@@ -124,11 +125,13 @@ namespace ALE_ConnectionLog {
             Respond(sb, "Session", "Player " + identity.DisplayName);
         }
 
-        [Command("find", "Looks for the Data of a specific player by name.")]
+        [Command("find", "Looks for the Data of a specific player by namePattern.")]
         [Permission(MyPromoteLevel.Moderator)]
-        public void Find(string name) {
+        public void Find(string namePattern) {
 
             StringBuilder sb = new StringBuilder();
+
+            namePattern = namePattern.ToLower();
 
             var connectionLog = Plugin.LogEntries;
 
@@ -136,7 +139,7 @@ namespace ALE_ConnectionLog {
 
                 foreach(var knownName in playerInfo.GetNames()) {
 
-                    if(knownName.Equals(name, StringComparison.OrdinalIgnoreCase)) {
+                    if(Matches(knownName, namePattern)) {
 
                         sb.AppendLine("Found Steam User: "+playerInfo.SteamId+" with name "+ knownName);
 
@@ -214,7 +217,7 @@ namespace ALE_ConnectionLog {
                     string date = dateEntry.Key;
                     HashSet<ulong> steamIds = dateEntry.Value;
 
-                    if (steamIds.Count != 0) {
+                    if (steamIds.Count > 1) {
 
                         if(!hasOutputIp) {
                             sb.AppendLine(ip);
@@ -260,6 +263,17 @@ namespace ALE_ConnectionLog {
             }
 
             sb.AppendLine(" minutes");
+        }
+
+        public static bool Matches(string input, string pattern) {
+
+            var regex = WildCardToRegular(pattern);
+
+            return Regex.IsMatch(input.ToLower(), regex);
+        }
+
+        private static string WildCardToRegular(string value) {
+            return "^" + Regex.Escape(value).Replace("\\?", ".").Replace("\\*", ".*") + "$";
         }
 
         public void Respond(StringBuilder sb, string title, string subtitle) {
