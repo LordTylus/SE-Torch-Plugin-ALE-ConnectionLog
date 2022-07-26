@@ -90,6 +90,8 @@ namespace ALE_ConnectionLog {
                 CpiDto cpiDto = new CpiDto();
                 cpiDto.SID = connectionPlayerInfo.SteamId;
                 cpiDto.AKN = new HashSet<string>(connectionPlayerInfo.GetNames());
+                cpiDto.LS = connectionPlayerInfo.LastSeen;
+                cpiDto.TPT = connectionPlayerInfo.TotalPlayTime;
 
                 foreach(var entry in connectionPlayerInfo.GetEntries()) {
 
@@ -142,6 +144,9 @@ namespace ALE_ConnectionLog {
             foreach(var logDto in data.CLE) {
 
                 var infoForPlayer = connectionLog.GetInfoForPlayer(logDto.SID);
+
+                infoForPlayer.LastSeen = logDto.LS;
+                infoForPlayer.TotalPlayTime = logDto.TPT;
 
                 infoForPlayer.SetNames(logDto.AKN);
 

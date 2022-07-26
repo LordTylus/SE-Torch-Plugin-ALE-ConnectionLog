@@ -6,6 +6,8 @@ namespace ALE_ConnectionLog.model {
     public class ConnectionPlayerInfo {
 
         public ulong SteamId { get; }
+        public DateTime LastSeen { get; set; }
+        public long TotalPlayTime { get; set; }
 
         private MyConcurrentHashSet<string> _allKnownNames = new MyConcurrentHashSet<string>();
         private MyConcurrentList<ConnectionEntry> _connectionEntries = new MyConcurrentList<ConnectionEntry>();
@@ -17,6 +19,8 @@ namespace ALE_ConnectionLog.model {
         internal void Login(string name, string ip, ConnectionLogConfig config) {
 
             _allKnownNames.Add(name);
+
+            LastSeen = DateTime.Now;
 
             if (!config.SaveIPs)
                 ip = "0.0.0.0";
@@ -30,10 +34,15 @@ namespace ALE_ConnectionLog.model {
 
         internal void Logout(bool sessionUnloading) {
 
+            LastSeen = DateTime.Now;
+
             ConnectionEntry entry = GetLatestEntry();
 
             if (entry == null)
                 return;
+
+            if (entry.Login != null)
+                TotalPlayTime += (long) (DateTime.Now - entry.Login.SnapshotTime).TotalSeconds;
 
             var snapshot = PlayerSnapshotFactory.Create(SteamId);
 

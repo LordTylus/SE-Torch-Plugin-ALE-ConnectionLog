@@ -195,7 +195,6 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="README.txt" />
     <Resource Include=".gitignore" />
     <Resource Include="Setup (run before opening plugin).bat" />
   </ItemGroup>
