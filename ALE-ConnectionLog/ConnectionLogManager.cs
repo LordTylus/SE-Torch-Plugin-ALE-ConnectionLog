@@ -93,6 +93,11 @@ namespace ALE_ConnectionLog {
                     ceDto.LSU = entry.LogoutThroughSessionUnload;
 
                     var loginSnapshot = entry.Login;
+
+                    /* No login yet nothing to save here */
+                    if (loginSnapshot == null)
+                        continue;
+
                     PsDto loginDto = new PsDto() {
                         IId = loginSnapshot.IdentityId,
                         Blk = loginSnapshot.BlockCount,

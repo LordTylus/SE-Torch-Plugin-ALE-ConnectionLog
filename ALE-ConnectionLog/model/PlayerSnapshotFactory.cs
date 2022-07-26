@@ -6,6 +6,19 @@ namespace ALE_ConnectionLog.model {
     
     public class PlayerSnapshotFactory {
 
+        public static PlayerSnapshot CreateEmpty() {
+
+            long IdentityID = 0;
+
+            int PCU = 0;
+            int Blocks = 0;
+            int GridCount = 0;
+
+            string FactionTag = "";
+
+            return new PlayerSnapshot(IdentityID, PCU, Blocks, GridCount, FactionTag);
+        }
+
         public static PlayerSnapshot Create(ulong SteamId) {
 
             long IdentityID = MySession.Static.Players.TryGetIdentityId(SteamId);

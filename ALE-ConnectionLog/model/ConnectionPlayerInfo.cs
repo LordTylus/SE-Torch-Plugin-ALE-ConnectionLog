@@ -30,6 +30,9 @@ namespace ALE_ConnectionLog.model {
 
             var snapshot = PlayerSnapshotFactory.Create(SteamId);
 
+            if (snapshot == null)
+                snapshot = PlayerSnapshotFactory.CreateEmpty();
+
             ConnectionEntry entry = new ConnectionEntry(ip, name, snapshot);
 
             _connectionEntries.Insert(0, entry);
@@ -154,7 +157,10 @@ namespace ALE_ConnectionLog.model {
                 if (Logout != null)
                     return Logout.SnapshotTime;
 
-                return Login.SnapshotTime;
+                if(Login != null)
+                    return Login.SnapshotTime;
+
+                return DateTime.Now;
             }
 
             internal int GetDurationMinutes() {
