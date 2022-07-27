@@ -282,7 +282,13 @@ namespace ALE_ConnectionLog {
 
                 foreach (var entry in playerInfo.GetEntries()) {
 
-                    if (entry.GetLastDateTime().Date == lookupDate.Date) {
+                    DateTime loginDate = entry.Login.SnapshotTime.Date;
+                    DateTime logoutDate = loginDate;
+
+                    if (entry.Logout != null)
+                        logoutDate = entry.Logout.SnapshotTime.Date;
+
+                    if (loginDate == lookupDate.Date || logoutDate == lookupDate.Date) {
 
                         long identityId = MySession.Static.Players.TryGetIdentityId(playerInfo.SteamId);
                         var identity = MySession.Static.Players.TryGetIdentity(identityId);
@@ -314,9 +320,35 @@ namespace ALE_ConnectionLog {
 
         [Command("online time", "Outputs which players logged in at the same date.")]
         [Permission(MyPromoteLevel.Moderator)]
-        public void Date(int hour = 0, int minute = 0, int second = 0, int day = 0, int month = 0, int year = 0) {
+        public void Date(int hour = -1, int minute = -1, int second = -1, int day = 0, int month = 0, int year = 0) {
 
             var now = DateTime.Now;
+
+            if (hour < 0) {
+
+                hour = now.Hour;
+
+                if (minute < 0) {
+
+                    minute = now.Minute;
+
+                    if (second < 0)
+                        second = now.Second;
+
+                } else {
+
+                    if (second < 0)
+                        second = 0;
+                }
+
+            } else {
+
+                if (minute < 0)
+                    minute = 0;
+
+                if (second < 0)
+                    second = 0;
+            }
 
             if (day <= 0)
                 day = now.Day;
