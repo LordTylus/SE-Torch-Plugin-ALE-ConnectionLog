@@ -139,32 +139,44 @@ namespace ALE_ConnectionLog {
             }
         }
 
-        private void PlayerConnected(long playerId) {
-            throw new NotImplementedException();
-        }
-
-        private void PlayerJoined(IPlayer obj) {
+       private void PlayerJoined(IPlayer obj) {
 
             ulong SteamId = obj.SteamId;
             string Name = obj.Name;
 
-            string ip = "0.0.0.0";
+            try { 
 
-            if(networking != null) {
+                string ip = "0.0.0.0";
 
-                var state = new MyP2PSessionState();
-                networking.Peer2Peer.GetSessionState(SteamId, ref state);
-                var ipBytes = BitConverter.GetBytes(state.RemoteIP).Reverse().ToArray();
-                ip = new IPAddress(ipBytes).ToString();
+                if(networking != null) {
+
+                    var state = new MyP2PSessionState();
+                    networking.Peer2Peer.GetSessionState(SteamId, ref state);
+                    var ipBytes = BitConverter.GetBytes(state.RemoteIP).Reverse().ToArray();
+                    ip = new IPAddress(ipBytes).ToString();
+                }
+
+                LogEntries.LoginPlayer(SteamId, Name, ip, Config);
+                Log.Info(obj.Name + " joined.");
+
+            } catch (Exception e) {
+                Log.Error(e, "Error on Join for Player " + Name + " " + SteamId);
             }
-
-            LogEntries.LoginPlayer(SteamId, Name, ip, Config);
-            Log.Info(obj.Name + " joined.");
         }
 
         private void PlayerLeft(IPlayer obj) {
-            LogEntries.LogoutPlayer(obj.SteamId, false);
-            Log.Info(obj.Name + " left.");
+
+            ulong SteamId = obj.SteamId;
+            string Name = obj.Name;
+
+            try {
+
+                LogEntries.LogoutPlayer(SteamId, false);
+                Log.Info(Name + " left.");
+
+            } catch (Exception e) {
+                Log.Error(e, "Error on Leave for Player " + Name + " " + SteamId);
+            }
         }
 
         internal void LogEveryoneOut() {
