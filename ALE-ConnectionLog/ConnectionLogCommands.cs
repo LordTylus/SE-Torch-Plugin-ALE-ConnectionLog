@@ -1,7 +1,9 @@
-﻿using ALE_Core.Utils;
+﻿using ALE_Core.Cooldown;
+using ALE_Core.Utils;
 using Sandbox.Game.World;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using Torch.Commands;
@@ -16,15 +18,46 @@ namespace ALE_ConnectionLog {
 
         public ConnectionLogPlugin Plugin => (ConnectionLogPlugin)Context.Plugin;
 
-        [Command("save", "Saves the log immediately")]
+        [Command("admin save", "Saves the log immediately")]
         [Permission(MyPromoteLevel.Admin)]
         public void Save() {
             Plugin.SaveLogEntriesAsync();
             Context.Respond("Log saved!");
         }
 
-        [Command("logoutall", "Logs all Players out.")]
+        [Command("admin wipe", "Deletes all Logs.")]
         [Permission(MyPromoteLevel.Owner)]
+        public void Wipe() {
+
+            var steamId = new SteamIdCooldownKey(PlayerUtils.GetSteamId(Context.Player));
+
+            if (!CheckConformation(steamId, "wipe"))
+                return;
+
+            var connectionLog = Plugin.LogEntries;
+            int countPlayers = connectionLog.GetPlayerCount();
+
+            connectionLog.Clear();
+
+            /* Now log everyone that is online in again */
+
+            var result = new List<MyPlayer>(MySession.Static.Players.GetOnlinePlayers()
+                .Where(x => x.IsRealPlayer && !string.IsNullOrEmpty(x.DisplayName)));
+
+            foreach (MyPlayer player in result) {
+
+                var Identity = player.Identity;
+                ulong SteamId = MySession.Static.Players.TryGetSteamId(Identity.IdentityId);
+                string ip = Plugin.GetIpOfSteamId(SteamId);
+
+                connectionLog.LoginPlayer(SteamId, player.DisplayName, ip, Plugin.Config);
+            }
+
+            Context.Respond("Deleted Logs for "+ countPlayers + " players!");
+        }
+
+        [Command("admin logoutall", "Logs all Players out.")]
+        [Permission(MyPromoteLevel.Admin)]
         public void LogoutAll() {
             Plugin.LogEveryoneOut();
             Context.Respond("Done!");
@@ -360,6 +393,22 @@ namespace ALE_ConnectionLog {
                 ModCommunication.SendMessageTo(new DialogMessage(title,
                     subtitle, sb.ToString()), Context.Player.SteamUserId);
             }
+        }
+
+        private bool CheckConformation(ICooldownKey cooldownKey, string command) {
+
+            var cooldownManager = Plugin.ConfirmationCooldownManager;
+
+            if (!cooldownManager.CheckCooldown(cooldownKey, command, out _)) {
+                cooldownManager.StopCooldown(cooldownKey);
+                return true;
+            }
+
+            cooldownManager.StartCooldown(cooldownKey, command, Plugin.CooldownConfirmation);
+
+            Context.Respond("Are you sure you want to continue? Enter the command again within " + Plugin.CooldownConfirmationSeconds + " seconds to confirm WIPE of ALL connection logs.");
+
+            return false;
         }
 
         private PlayerParam? FindPlayerParam(string nameIdOrSteamId) {

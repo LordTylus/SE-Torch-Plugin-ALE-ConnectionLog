@@ -1,5 +1,6 @@
 ﻿using ALE_ConnectionLog.model;
 using ALE_ConnectionLog.serialize;
+using ALE_Core.Cooldown;
 using NLog;
 using Sandbox.Game;
 using Sandbox.Game.World;
@@ -37,6 +38,10 @@ namespace ALE_ConnectionLog {
 
         private ConnectionLogManager _connectionLogManager;
         public ConnectionLogManager ConnectionLogManager => _connectionLogManager;
+
+        public CooldownManager ConfirmationCooldownManager { get; } = new CooldownManager();
+        public long CooldownConfirmationSeconds { get { return 30; } }
+        public long CooldownConfirmation { get { return 30 * 1000; } }
 
         public ConnectionLogConfig Config => _config?.Data;
         public ConnectionLog LogEntries;
@@ -144,17 +149,9 @@ namespace ALE_ConnectionLog {
             ulong SteamId = obj.SteamId;
             string Name = obj.Name;
 
-            try { 
+            try {
 
-                string ip = "0.0.0.0";
-
-                if(networking != null) {
-
-                    var state = new MyP2PSessionState();
-                    networking.Peer2Peer.GetSessionState(SteamId, ref state);
-                    var ipBytes = BitConverter.GetBytes(state.RemoteIP).Reverse().ToArray();
-                    ip = new IPAddress(ipBytes).ToString();
-                }
+                string ip = GetIpOfSteamId(SteamId);
 
                 LogEntries.LoginPlayer(SteamId, Name, ip, Config);
                 Log.Info(obj.Name + " joined.");
@@ -162,6 +159,21 @@ namespace ALE_ConnectionLog {
             } catch (Exception e) {
                 Log.Error(e, "Error on Join for Player " + Name + " " + SteamId);
             }
+        }
+
+        internal string GetIpOfSteamId(ulong SteamId) {
+
+            string ip = "0.0.0.0";
+
+            if (networking != null) {
+
+                var state = new MyP2PSessionState();
+                networking.Peer2Peer.GetSessionState(SteamId, ref state);
+                var ipBytes = BitConverter.GetBytes(state.RemoteIP).Reverse().ToArray();
+                ip = new IPAddress(ipBytes).ToString();
+            }
+
+            return ip;
         }
 
         private void PlayerLeft(IPlayer obj) {

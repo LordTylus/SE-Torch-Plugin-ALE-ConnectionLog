@@ -18,6 +18,14 @@ namespace ALE_ConnectionLog.model {
             return _playerInfos.Values;
         }
 
+        public int GetPlayerCount() {
+            return _playerInfos.Count;
+        }
+
+        internal void Clear() {
+            _playerInfos.Clear();
+        }
+
         public ConnectionPlayerInfo GetInfoForPlayer(ulong steamId) {
 
             if(!_playerInfos.TryGetValue(steamId, out ConnectionPlayerInfo info)) {
