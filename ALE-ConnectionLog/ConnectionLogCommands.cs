@@ -71,6 +71,8 @@ namespace ALE_ConnectionLog {
 
             var connectionLog = Plugin.LogEntries;
 
+            int count = 0;
+
             foreach (var playerInfo in connectionLog.GetPlayerInfos()) {
 
                 foreach (var entry in playerInfo.GetEntries()) {
@@ -97,12 +99,48 @@ namespace ALE_ConnectionLog {
                         sb.Append("   ");
                         AddPlayTimeToSb(sb, entry);
 
-                        break;
+                        count++;
                     }
                 }
             }
 
+            sb.AppendLine();
+            sb.AppendLine("Found a total of "+count+" sessions!");
+
             Respond(sb, "Open Sessions", "Sessions without Logout");
+        }
+
+        [Command("admin fix", "Fixes all open sessions that are not current.")]
+        [Permission(MyPromoteLevel.Owner)]
+        public void FixSessions() {
+
+            var steamId = new SteamIdCooldownKey(PlayerUtils.GetSteamId(Context.Player));
+
+            if (!CheckConformation(steamId, "fix"))
+                return;
+
+            var connectionLog = Plugin.LogEntries;
+
+            int count = 0;
+
+            foreach (var playerInfo in connectionLog.GetPlayerInfos()) {
+
+                var latestEntry = playerInfo.GetLatestEntry();
+
+                foreach (var entry in playerInfo.GetEntries()) {
+
+                    /* skip current */
+                    if (entry == latestEntry)
+                        continue;
+
+                    if (entry.Logout == null) {
+                        entry.ForceLogout();
+                        count++;
+                    }
+                }
+            }
+
+            Context.Respond("Fixed "+ count+ " sessions.");
         }
 
         [Command("playtime", "Outputs the total Playtimes of the specified player.")]
@@ -597,7 +635,7 @@ namespace ALE_ConnectionLog {
 
             cooldownManager.StartCooldown(cooldownKey, command, Plugin.CooldownConfirmation);
 
-            Context.Respond("Are you sure you want to continue? Enter the command again within " + Plugin.CooldownConfirmationSeconds + " seconds to confirm WIPE of ALL connection logs.");
+            Context.Respond("Are you sure you want to continue? Enter the command again within " + Plugin.CooldownConfirmationSeconds + " seconds to confirm.");
 
             return false;
         }

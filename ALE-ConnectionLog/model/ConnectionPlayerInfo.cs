@@ -156,6 +156,10 @@ namespace ALE_ConnectionLog.model {
                 this.LogoutThroughSessionUnload = sessionUnloading;
             }
 
+            public void ForceLogout() {
+                this.Logout = PlayerSnapshotFactory.Create(Login);
+            }
+
             public DateTime GetLastDateTime() {
 
                 if (Logout != null)
