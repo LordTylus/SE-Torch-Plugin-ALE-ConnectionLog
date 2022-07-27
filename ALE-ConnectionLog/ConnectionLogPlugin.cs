@@ -40,8 +40,8 @@ namespace ALE_ConnectionLog {
         public ConnectionLogManager ConnectionLogManager => _connectionLogManager;
 
         public CooldownManager ConfirmationCooldownManager { get; } = new CooldownManager();
-        public long CooldownConfirmationSeconds { get { return 30; } }
-        public long CooldownConfirmation { get { return 30 * 1000; } }
+        public long CooldownConfirmationSeconds { get { return 15; } }
+        public long CooldownConfirmation { get { return 15 * 1000; } }
 
         public ConnectionLogConfig Config => _config?.Data;
         public ConnectionLog LogEntries;
