@@ -82,18 +82,16 @@ namespace ALE_ConnectionLog {
                         long identityId = MySession.Static.Players.TryGetIdentityId(playerInfo.SteamId);
                         var identity = MySession.Static.Players.TryGetIdentity(identityId);
 
+                        sb.AppendLine(playerInfo.SteamId + " " + entry.Name);
+
                         if (identity != null) {
 
                             string faction = FactionUtils.GetPlayerFactionTag(identity.IdentityId);
 
                             if (faction == "")
-                                sb.AppendLine(playerInfo.SteamId + " " + entry.Name + "    #" + identity.IdentityId + "   " + identity.DisplayName);
+                                sb.AppendLine("   #" + identity.IdentityId + "   " + identity.DisplayName);
                             else
-                                sb.AppendLine(playerInfo.SteamId + " " + entry.Name + "    #" + identity.IdentityId + "   " + identity.DisplayName + " [" + faction + "]");
-
-                        } else {
-
-                            sb.AppendLine(playerInfo.SteamId + " " + entry.Name);
+                                sb.AppendLine("   #" + identity.IdentityId + "   " + identity.DisplayName + " [" + faction + "]");
                         }
 
                         sb.Append("   ");
@@ -302,6 +300,8 @@ namespace ALE_ConnectionLog {
 
             var connectionLog = Plugin.LogEntries;
 
+            int count = 0;
+
             foreach (var playerInfo in connectionLog.GetPlayerInfos()) {
 
                 foreach(var knownName in playerInfo.GetNames()) {
@@ -329,10 +329,16 @@ namespace ALE_ConnectionLog {
                             sb.AppendLine("    Session: " + entry.Name + "   " + entry.GetLastDateTime().ToString("yyyy-MM-dd HH:mm:ss"));
 
                         sb.AppendLine();
+
+                        count++;
+
                         break;
                     }
                 }
             }
+
+            sb.AppendLine();
+            sb.AppendLine("Found a total of " + count + " matches!");
 
             Respond(sb, "Found Players", "Players whose name matches case insensitive");
         }
@@ -358,6 +364,8 @@ namespace ALE_ConnectionLog {
 
             var connectionLog = Plugin.LogEntries;
 
+            int count = 0;
+
             foreach (var playerInfo in connectionLog.GetPlayerInfos()) {
 
                 foreach (var entry in playerInfo.GetEntries()) {
@@ -373,27 +381,30 @@ namespace ALE_ConnectionLog {
                         long identityId = MySession.Static.Players.TryGetIdentityId(playerInfo.SteamId);
                         var identity = MySession.Static.Players.TryGetIdentity(identityId);
 
+                        sb.AppendLine(playerInfo.SteamId + " " + entry.Name);
+
                         if (identity != null) {
 
                             string faction = FactionUtils.GetPlayerFactionTag(identity.IdentityId);
 
                             if (faction == "")
-                                sb.AppendLine(playerInfo.SteamId + " " + entry.Name + "    #" + identity.IdentityId + "   " + identity.DisplayName);
+                                sb.AppendLine("   #" + identity.IdentityId + "   " + identity.DisplayName);
                             else
-                                sb.AppendLine(playerInfo.SteamId + " " + entry.Name + "    #" + identity.IdentityId + "   " + identity.DisplayName + " [" + faction + "]");
-
-                        } else {
-
-                            sb.AppendLine(playerInfo.SteamId + " " + entry.Name);
+                                sb.AppendLine("   #" + identity.IdentityId + "   " + identity.DisplayName + " [" + faction + "]");
                         }
 
                         sb.Append("   ");
                         AddPlayTimeToSb(sb, entry);
 
+                        count++;
+
                         break;
                     }
                 }
             }
+
+            sb.AppendLine();
+            sb.AppendLine("Found a total of " + count + " unique players!");
 
             Respond(sb, "Found Players", "Played on " + lookupDate.ToString("yyyy-MM-dd"));
         }
@@ -445,6 +456,8 @@ namespace ALE_ConnectionLog {
 
             var connectionLog = Plugin.LogEntries;
 
+            int count = 0;
+
             foreach (var playerInfo in connectionLog.GetPlayerInfos()) {
 
                 foreach (var entry in playerInfo.GetEntries()) {
@@ -477,10 +490,15 @@ namespace ALE_ConnectionLog {
                         sb.Append("   ");
                         AddPlayTimeToSb(sb, entry);
 
+                        count++;
+
                         break;
                     }
                 }
             }
+
+            sb.AppendLine();
+            sb.AppendLine("Found a total of " + count + " unique players!");
 
             Respond(sb, "Found Players", "Played on " + lookupDate.ToString("yyyy-MM-dd HH:mm:ss"));
         }
