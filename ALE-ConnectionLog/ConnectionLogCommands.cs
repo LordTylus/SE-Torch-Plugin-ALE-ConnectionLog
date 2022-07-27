@@ -230,9 +230,10 @@ namespace ALE_ConnectionLog {
 
                         sb.AppendLine("Found Steam User: "+playerInfo.SteamId+" with name "+ knownName);
 
-                        MyIdentity identity = PlayerUtils.GetIdentityByNameOrId(playerInfo.SteamId.ToString());
-                        
-                        if(identity != null) {
+                        long identityId = MySession.Static.Players.TryGetIdentityId(playerInfo.SteamId);
+                        var identity = MySession.Static.Players.TryGetIdentity(identityId);
+
+                        if (identity != null) {
 
                             string faction = FactionUtils.GetPlayerFactionTag(identity.IdentityId);
 
@@ -254,6 +255,122 @@ namespace ALE_ConnectionLog {
             }
 
             Respond(sb, "Found Players", "Players whose name matches case insensitive");
+        }
+
+        [Command("online date", "Outputs which players logged in at the same date.")]
+        [Permission(MyPromoteLevel.Moderator)]
+        public void Date(int day = 0, int month = 0, int year = 0) {
+
+            var now = DateTime.Now;
+
+            if (day <= 0)
+                day = now.Day;
+
+            if (month <= 0)
+                month = now.Month;
+
+            if (year <= 0)
+                year = now.Year;
+
+            DateTime lookupDate = new DateTime(year, month, day);
+
+            StringBuilder sb = new StringBuilder();
+
+            var connectionLog = Plugin.LogEntries;
+
+            foreach (var playerInfo in connectionLog.GetPlayerInfos()) {
+
+                foreach (var entry in playerInfo.GetEntries()) {
+
+                    if (entry.GetLastDateTime().Date == lookupDate.Date) {
+
+                        long identityId = MySession.Static.Players.TryGetIdentityId(playerInfo.SteamId);
+                        var identity = MySession.Static.Players.TryGetIdentity(identityId);
+
+                        if (identity != null) {
+
+                            string faction = FactionUtils.GetPlayerFactionTag(identity.IdentityId);
+
+                            if (faction == "")
+                                sb.AppendLine(playerInfo.SteamId + " " + entry.Name + "    #" + identity.IdentityId + "   " + identity.DisplayName);
+                            else
+                                sb.AppendLine(playerInfo.SteamId + " " + entry.Name + "    #" + identity.IdentityId + "   " + identity.DisplayName + " [" + faction + "]");
+
+                        } else {
+
+                            sb.AppendLine(playerInfo.SteamId + " " + entry.Name);
+                        }
+
+                        sb.Append("   ");
+                        AddPlayTimeToSb(sb, entry);
+
+                        break;
+                    }
+                }
+            }
+
+            Respond(sb, "Found Players", "Played on " + lookupDate.ToString("yyyy-MM-dd"));
+        }
+
+        [Command("online time", "Outputs which players logged in at the same date.")]
+        [Permission(MyPromoteLevel.Moderator)]
+        public void Date(int hour = 0, int minute = 0, int second = 0, int day = 0, int month = 0, int year = 0) {
+
+            var now = DateTime.Now;
+
+            if (day <= 0)
+                day = now.Day;
+
+            if (month <= 0)
+                month = now.Month;
+
+            if (year <= 0)
+                year = now.Year;
+
+            DateTime lookupDate = new DateTime(year, month, day, hour, minute, second);
+
+            StringBuilder sb = new StringBuilder();
+
+            var connectionLog = Plugin.LogEntries;
+
+            foreach (var playerInfo in connectionLog.GetPlayerInfos()) {
+
+                foreach (var entry in playerInfo.GetEntries()) {
+
+                    var loginDate = entry.Login.SnapshotTime;
+
+                    var logoutDate = now;
+                    if (entry.Logout != null)
+                        logoutDate = entry.Logout.SnapshotTime;
+
+                    if(loginDate <= lookupDate && lookupDate <= logoutDate) { 
+
+                        long identityId = MySession.Static.Players.TryGetIdentityId(playerInfo.SteamId);
+                        var identity = MySession.Static.Players.TryGetIdentity(identityId);
+
+                        if (identity != null) {
+
+                            string faction = FactionUtils.GetPlayerFactionTag(identity.IdentityId);
+
+                            if (faction == "")
+                                sb.AppendLine(playerInfo.SteamId + " " + entry.Name + "    #" + identity.IdentityId + "   " + identity.DisplayName);
+                            else
+                                sb.AppendLine(playerInfo.SteamId + " " + entry.Name + "    #" + identity.IdentityId + "   " + identity.DisplayName + " [" + faction + "]");
+
+                        } else {
+
+                            sb.AppendLine(playerInfo.SteamId + " " + entry.Name);
+                        }
+
+                        sb.Append("   ");
+                        AddPlayTimeToSb(sb, entry);
+
+                        break;
+                    }
+                }
+            }
+
+            Respond(sb, "Found Players", "Played on " + lookupDate.ToString("yyyy-MM-dd HH:mm:ss"));
         }
 
         [Command("multis", "Outputs which Players had the same IP adress and when.")]
