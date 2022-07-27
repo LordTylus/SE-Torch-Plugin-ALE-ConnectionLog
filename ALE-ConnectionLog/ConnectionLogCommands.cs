@@ -63,6 +63,48 @@ namespace ALE_ConnectionLog {
             Context.Respond("Done!");
         }
 
+        [Command("admin open", "Finds all open Sessions.")]
+        [Permission(MyPromoteLevel.Owner)]
+        public void OpenSessions() {
+
+            StringBuilder sb = new StringBuilder();
+
+            var connectionLog = Plugin.LogEntries;
+
+            foreach (var playerInfo in connectionLog.GetPlayerInfos()) {
+
+                foreach (var entry in playerInfo.GetEntries()) {
+
+                    if(entry.Logout == null) { 
+
+                        long identityId = MySession.Static.Players.TryGetIdentityId(playerInfo.SteamId);
+                        var identity = MySession.Static.Players.TryGetIdentity(identityId);
+
+                        if (identity != null) {
+
+                            string faction = FactionUtils.GetPlayerFactionTag(identity.IdentityId);
+
+                            if (faction == "")
+                                sb.AppendLine(playerInfo.SteamId + " " + entry.Name + "    #" + identity.IdentityId + "   " + identity.DisplayName);
+                            else
+                                sb.AppendLine(playerInfo.SteamId + " " + entry.Name + "    #" + identity.IdentityId + "   " + identity.DisplayName + " [" + faction + "]");
+
+                        } else {
+
+                            sb.AppendLine(playerInfo.SteamId + " " + entry.Name);
+                        }
+
+                        sb.Append("   ");
+                        AddPlayTimeToSb(sb, entry);
+
+                        break;
+                    }
+                }
+            }
+
+            Respond(sb, "Open Sessions", "Sessions without Logout");
+        }
+
         [Command("playtime", "Outputs the total Playtimes of the specified player.")]
         [Permission(MyPromoteLevel.Moderator)]
         public void PlayTime(string nameIdOrSteamId) {
