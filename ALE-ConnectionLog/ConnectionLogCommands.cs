@@ -480,18 +480,16 @@ namespace ALE_ConnectionLog {
                         long identityId = MySession.Static.Players.TryGetIdentityId(playerInfo.SteamId);
                         var identity = MySession.Static.Players.TryGetIdentity(identityId);
 
+                        sb.AppendLine(playerInfo.SteamId + " " + entry.Name);
+
                         if (identity != null) {
 
                             string faction = FactionUtils.GetPlayerFactionTag(identity.IdentityId);
 
                             if (faction == "")
-                                sb.AppendLine(playerInfo.SteamId + " " + entry.Name + "    #" + identity.IdentityId + "   " + identity.DisplayName);
+                                sb.AppendLine("   #" + identity.IdentityId + "   " + identity.DisplayName);
                             else
-                                sb.AppendLine(playerInfo.SteamId + " " + entry.Name + "    #" + identity.IdentityId + "   " + identity.DisplayName + " [" + faction + "]");
-
-                        } else {
-
-                            sb.AppendLine(playerInfo.SteamId + " " + entry.Name);
+                                sb.AppendLine("   #" + identity.IdentityId + "   " + identity.DisplayName + " [" + faction + "]");
                         }
 
                         sb.Append("   ");
