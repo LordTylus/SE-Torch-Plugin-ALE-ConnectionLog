@@ -157,7 +157,7 @@ namespace ALE_ConnectionLog.model {
             }
 
             public void ForceLogout() {
-                this.Logout = PlayerSnapshotFactory.Create(Login);
+                this.Logout = PlayerSnapshotFactory.CreateCopy(Login);
             }
 
             public DateTime GetLastDateTime() {

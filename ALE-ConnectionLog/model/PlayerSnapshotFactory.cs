@@ -51,5 +51,22 @@ namespace ALE_ConnectionLog.model {
 
             return new PlayerSnapshot(IdentityID, PCU, Blocks, GridCount, FactionTag);
         }
+
+        internal static PlayerSnapshot CreateCopy(PlayerSnapshot snapshot) {
+
+            if (snapshot == null)
+                return null;
+
+            long IdentityID = snapshot.IdentityId;
+
+            int PCU = snapshot.PCU;
+            int Blocks = snapshot.BlockCount;
+            int GridCount = snapshot.GridCount;
+
+            string FactionTag = snapshot.Faction;
+            var SnapshotTime = snapshot.SnapshotTime;
+
+            return new PlayerSnapshot(IdentityID, PCU, Blocks, GridCount, FactionTag, SnapshotTime);
+        }
     }
 }
