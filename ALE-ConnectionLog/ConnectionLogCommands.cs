@@ -605,21 +605,29 @@ namespace ALE_ConnectionLog {
 
                 bool identityPresent = identity != null;
 
-                if (ignoreMissingIdentities && !identityPresent)
-                    continue;
-
                 var lastSeen = playerInfo.LastSeen;
 
-                bool identityFine = identityId == lastSeen.IdentityId;
+                if (!identityPresent) {
 
+                    if (ignoreMissingIdentities)
+                        continue;
+
+                    sb.AppendLine(playerInfo.SteamId + " " + playerInfo.LastName);
+                    sb.AppendLine("   Last Seen: " + lastSeen.SnapshotTime.ToString("yyyy-MM-dd  HH:mm:ss"));
+
+                    sb.AppendLine("   Has no Identity anymore.");
+
+                    continue;
+                }
+                    
                 int currentPcu = identity.BlockLimits.PCUBuilt;
                 int lastSeenPcu = lastSeen.PCU;
 
                 int pcuDifference = currentPcu - lastSeenPcu - marginOfError;
 
-                bool pcuFine = pcuDifference <= 0;
+                bool pcuFine = pcuDifference > 0;
 
-                if (!identityFine || !pcuFine || !identityPresent) {
+                if (!pcuFine) {
 
                     var lastEntry = playerInfo.GetLatestEntry();
 
@@ -627,34 +635,24 @@ namespace ALE_ConnectionLog {
                     if (lastEntry != null && lastEntry.Logout == null)
                         continue;
 
-                    if (!identityPresent) {
+                    var lastSeenDate = PlayerUtils.GetLastSeenDate(identity);
 
-                        sb.AppendLine(playerInfo.SteamId + " " + playerInfo.LastName);
-                        sb.AppendLine("   Last Seen: " + playerInfo.LastSeen.SnapshotTime.ToString("yyyy-MM-dd  HH:mm:ss"));
+                    if (DateTime.Now.AddDays(-ignoreDays) > lastSeenDate)
+                        continue;
 
-                        sb.AppendLine("   Has no Identity anymore.");
+                    sb.AppendLine(playerInfo.SteamId + " " + playerInfo.LastName);
 
-                    } else {
+                    sb.AppendLine("   Last Seen: " + lastSeenDate.ToString("yyyy-MM-dd  HH:mm:ss"));
 
-                        var lastSeenDate = PlayerUtils.GetLastSeenDate(identity);
+                    string faction = FactionUtils.GetPlayerFactionTag(identity.IdentityId);
 
-                        if (DateTime.Now.AddDays(-ignoreDays) > lastSeenDate)
-                            continue;
+                    if (faction == "")
+                        sb.AppendLine("   #" + identity.IdentityId + "   " + identity.DisplayName);
+                    else
+                        sb.AppendLine("   #" + identity.IdentityId + "   " + identity.DisplayName + " [" + faction + "]");
 
-                        sb.AppendLine(playerInfo.SteamId + " " + playerInfo.LastName);
-
-                        sb.AppendLine("   Last Seen: " + lastSeenDate.ToString("yyyy-MM-dd  HH:mm:ss"));
-
-                        string faction = FactionUtils.GetPlayerFactionTag(identity.IdentityId);
-
-                        if (faction == "")
-                            sb.AppendLine("   #" + identity.IdentityId + "   " + identity.DisplayName);
-                        else
-                            sb.AppendLine("   #" + identity.IdentityId + "   " + identity.DisplayName + " [" + faction + "]");
-
-                        sb.AppendLine("   Used to have " + lastSeenPcu + " but now has " + currentPcu + " (" + (currentPcu - lastSeenPcu) + ")");
-                        sb.AppendLine();
-                    }
+                    sb.AppendLine("   Used to have " + lastSeenPcu + " but now has " + currentPcu + " (" + (currentPcu - lastSeenPcu) + ")");
+                    sb.AppendLine();
 
                     count++;
                 }
