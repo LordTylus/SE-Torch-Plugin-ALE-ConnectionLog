@@ -166,7 +166,16 @@ namespace ALE_ConnectionLog {
             var connectionLog = Plugin.LogEntries;
             var playerInfo = connectionLog.GetInfoForPlayer(playerParam.Value.SteamId);
 
+            sb.AppendLine("Identity: " + playerInfo.LastSeen.IdentityId);
+            sb.AppendLine("Last Name: " + playerInfo.LastName);
+            sb.AppendLine("Faction: " + playerInfo.LastSeen.Faction);
+            sb.AppendLine("Blocks: " + playerInfo.LastSeen.BlockCount);
+            sb.AppendLine("PCU: " + playerInfo.LastSeen.PCU);
+            sb.AppendLine("Grids: " + playerInfo.LastSeen.GridCount);
+            sb.AppendLine();
+
             sb.AppendLine("Total play time: " + (int) (playerInfo.TotalPlayTime/60) +" minutes.");
+            sb.AppendLine("--------------------------");
             sb.AppendLine();
 
             foreach (var entry in playerInfo.GetEntries()) {
@@ -243,6 +252,16 @@ namespace ALE_ConnectionLog {
 
             AddLastSeenToSb(sb, playerParam.Value.SteamId);
 
+            sb.AppendLine("Identity: " + playerInfo.LastSeen.IdentityId);
+            sb.AppendLine("Last Name: " + playerInfo.LastName);
+            sb.AppendLine("Faction: " + playerInfo.LastSeen.Faction);
+            sb.AppendLine("Blocks: " + playerInfo.LastSeen.BlockCount);
+            sb.AppendLine("PCU: " + playerInfo.LastSeen.PCU);
+            sb.AppendLine("Grids: " + playerInfo.LastSeen.GridCount);
+            sb.AppendLine();
+            sb.AppendLine("Sessions");
+            sb.AppendLine("--------------------------");
+            sb.AppendLine();
             foreach (var entry in playerInfo.GetEntries()) {
 
                 if(config.ShowIpInSessionsCommand)
