@@ -553,30 +553,32 @@ namespace ALE_ConnectionLog {
             foreach (var ipEntry in ipToDateToSteamDict) {
 
                 string ip = ipEntry.Key;
-                bool hasOutputIp = false;
 
-                foreach(var dateEntry in ipEntry.Value) {
+                HashSet<ulong> allKnownSteamIdsToIp = new HashSet<ulong>();
+
+                foreach (var dateEntry in ipEntry.Value) 
+                    allKnownSteamIdsToIp.UnionWith(dateEntry.Value);
+
+                if (allKnownSteamIdsToIp.Count <= 1)
+                    continue;
+
+                foreach (var dateEntry in ipEntry.Value) {
 
                     string date = dateEntry.Key;
                     HashSet<ulong> steamIds = dateEntry.Value;
 
-                    if (steamIds.Count > 1) {
+                    sb.AppendLine(ip);
+                    sb.AppendLine("   " + date);
 
-                        if(!hasOutputIp) {
-                            sb.AppendLine(ip);
-                            sb.AppendLine("   "+date);
+                    foreach (ulong steamId in steamIds) {
 
-                            foreach(ulong steamId in steamIds) {
+                        long identityId = MySession.Static.Players.TryGetIdentityId(steamId);
+                        MyIdentity identity = PlayerUtils.GetIdentityById(identityId);
 
-                                long identityId = MySession.Static.Players.TryGetIdentityId(steamId);
-                                MyIdentity identity = PlayerUtils.GetIdentityById(identityId);
-
-                                if(identity == null)
-                                    sb.AppendLine("      " + steamId);
-                                else
-                                    sb.AppendLine("      " + steamId +" "+identity.DisplayName+" #"+identity.IdentityId);
-                            }
-                        }
+                        if (identity == null)
+                            sb.AppendLine("      " + steamId);
+                        else
+                            sb.AppendLine("      " + steamId + " " + identity.DisplayName + " #" + identity.IdentityId);
                     }
                 }
             }
