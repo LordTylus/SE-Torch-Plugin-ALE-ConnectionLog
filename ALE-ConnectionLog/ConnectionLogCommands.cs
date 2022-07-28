@@ -1,4 +1,5 @@
-﻿using ALE_Core.Cooldown;
+﻿using ALE_ConnectionLog.model;
+using ALE_Core.Cooldown;
 using ALE_Core.Utils;
 using Sandbox.Game.World;
 using System;
@@ -18,11 +19,29 @@ namespace ALE_ConnectionLog {
 
         public ConnectionLogPlugin Plugin => (ConnectionLogPlugin)Context.Plugin;
 
-        [Command("admin save", "Saves the log immediately")]
+        [Command("admin save", "Saves the log immediately.")]
         [Permission(MyPromoteLevel.Admin)]
         public void Save() {
             Plugin.SaveLogEntriesAsync();
             Context.Respond("Log saved!");
+        }
+
+        [Command("admin reload", "Reloads the file from file system.")]
+        [Permission(MyPromoteLevel.Owner)]
+        public void Reload() {
+
+            var steamId = new SteamIdCooldownKey(PlayerUtils.GetSteamId(Context.Player));
+
+            if (!CheckConformation(steamId, "reload"))
+                return;
+
+            Plugin.Reload();
+
+            var connectionLog = Plugin.LogEntries;
+            
+            LogEveryoneInAgain(connectionLog);
+
+            Context.Respond("Done!");
         }
 
         [Command("admin wipe", "Deletes all Logs.")]
@@ -39,19 +58,7 @@ namespace ALE_ConnectionLog {
 
             connectionLog.Clear();
 
-            /* Now log everyone that is online in again */
-
-            var result = new List<MyPlayer>(MySession.Static.Players.GetOnlinePlayers()
-                .Where(x => x.IsRealPlayer && !string.IsNullOrEmpty(x.DisplayName)));
-
-            foreach (MyPlayer player in result) {
-
-                var Identity = player.Identity;
-                ulong SteamId = MySession.Static.Players.TryGetSteamId(Identity.IdentityId);
-                string ip = Plugin.GetIpOfSteamId(SteamId);
-
-                connectionLog.LoginPlayer(SteamId, player.DisplayName, ip, Plugin.Config);
-            }
+            LogEveryoneInAgain(connectionLog);
 
             Context.Respond("Deleted Logs for "+ countPlayers + " players!");
         }
@@ -656,6 +663,23 @@ namespace ALE_ConnectionLog {
             Context.Respond("Are you sure you want to continue? Enter the command again within " + Plugin.CooldownConfirmationSeconds + " seconds to confirm.");
 
             return false;
+        }
+
+        private void LogEveryoneInAgain(ConnectionLog connectionLog) {
+
+            /* Now log everyone that is online in again */
+
+            var result = new List<MyPlayer>(MySession.Static.Players.GetOnlinePlayers()
+                .Where(x => x.IsRealPlayer && !string.IsNullOrEmpty(x.DisplayName)));
+
+            foreach (MyPlayer player in result) {
+
+                var Identity = player.Identity;
+                ulong SteamId = MySession.Static.Players.TryGetSteamId(Identity.IdentityId);
+                string ip = Plugin.GetIpOfSteamId(SteamId);
+
+                connectionLog.LoginPlayer(SteamId, player.DisplayName, ip, Plugin.Config);
+            }
         }
 
         private PlayerParam? FindPlayerParam(string nameIdOrSteamId) {

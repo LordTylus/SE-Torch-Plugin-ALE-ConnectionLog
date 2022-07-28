@@ -38,6 +38,7 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <TextBlock Grid.Column="0" Grid.Row ="0" VerticalAlignment="Center" Text="ALE-ConnectionLog" FontWeight="Bold" FontSize="16" Grid.ColumnSpan="2" Margin="5"/>
@@ -70,25 +71,27 @@
         <TextBlock Grid.Column="1" Grid.Row ="10" VerticalAlignment="Top" Grid.ColumnSpan="2" TextWrapping="Wrap" Text="Adds logout information for all logged in players." Margin="5"/>
         <TextBlock Grid.Column="0" Grid.Row ="11" VerticalAlignment="Top" Text="!connectlog admin wipe" Margin="5" />
         <TextBlock Grid.Column="1" Grid.Row ="11" VerticalAlignment="Top" Grid.ColumnSpan="2" TextWrapping="Wrap" Text="Deletes all logs." Margin="5"/>
-        <TextBlock Grid.Column="0" Grid.Row ="12" VerticalAlignment="Top" Text="!connectlog admin open" Margin="5" />
-        <TextBlock Grid.Column="1" Grid.Row ="12" VerticalAlignment="Top" Grid.ColumnSpan="2" TextWrapping="Wrap" Text="Lists all open Sessions (including logged in players)." Margin="5"/>
-        <TextBlock Grid.Column="0" Grid.Row ="13" VerticalAlignment="Top" Text="!connectlog admin fix" Margin="5" />
-        <TextBlock Grid.Column="1" Grid.Row ="13" VerticalAlignment="Top" Grid.ColumnSpan="2" TextWrapping="Wrap" Text="Fixes all open Sessions (excluding currently logged in players)." Margin="5"/>
-        <TextBlock Grid.Column="0" Grid.Row ="14" VerticalAlignment="Top" Text="!connectlog playtime &lt;Playername or SteamID>" Margin="5" />
-        <TextBlock Grid.Column="1" Grid.Row ="14" VerticalAlignment="Top" Grid.ColumnSpan="2" TextWrapping="Wrap" Text="Lists the playtimes for the specified player." Margin="5"/>
-        <TextBlock Grid.Column="0" Grid.Row ="15" VerticalAlignment="Top" Text="!connectlog ips &lt;Playername or SteamID>" Margin="5" />
-        <TextBlock Grid.Column="1" Grid.Row ="15" VerticalAlignment="Top" Grid.ColumnSpan="2" TextWrapping="Wrap" Text="Lists all IPs the specified player has connected from." Margin="5"/>
-        <TextBlock Grid.Column="0" Grid.Row ="16" VerticalAlignment="Top" Text="!connectlog names &lt;Playername or SteamID>" Margin="5" />
-        <TextBlock Grid.Column="1" Grid.Row ="16" VerticalAlignment="Top" Grid.ColumnSpan="2" TextWrapping="Wrap" Text="Lists all names the player has connected with." Margin="5"/>
-        <TextBlock Grid.Column="0" Grid.Row ="17" VerticalAlignment="Top" Text="!connectlog sessions &lt;Playername or SteamID>" Margin="5" />
-        <TextBlock Grid.Column="1" Grid.Row ="17" VerticalAlignment="Top" Grid.ColumnSpan="2" TextWrapping="Wrap" Text="Lists session information of the player." Margin="5"/>
-        <TextBlock Grid.Column="0" Grid.Row ="18" VerticalAlignment="Top" Text="!connectlog find &lt;Player Name Pattern>" Margin="5" />
-        <TextBlock Grid.Column="1" Grid.Row ="18" VerticalAlignment="Top" Grid.ColumnSpan="2" TextWrapping="Wrap" Text="Supports wildcards (*), looks up IDs etc. for players matching the pattern." Margin="5"/>
-        <TextBlock Grid.Column="0" Grid.Row ="19" VerticalAlignment="Top" Text="!connectlog multis [show 0.0.0.0 IPs (true|false)]" Margin="5" />
-        <TextBlock Grid.Column="1" Grid.Row ="19" VerticalAlignment="Top" Grid.ColumnSpan="2" TextWrapping="Wrap" Text="Displays Players that connected from the same IP." Margin="5"/>
-        <TextBlock Grid.Column="0" Grid.Row ="20" VerticalAlignment="Top" Text="!connectlog online date [day] [month] [year]" Margin="5" />
-        <TextBlock Grid.Column="1" Grid.Row ="20" VerticalAlignment="Top" Grid.ColumnSpan="2" TextWrapping="Wrap" Text="Displays Players that connected on the given date." Margin="5"/>
-        <TextBlock Grid.Column="0" Grid.Row ="21" VerticalAlignment="Top" Text="!connectlog online time [hour] [minute] [second] [day] [month] [year]" Margin="5" />
-        <TextBlock Grid.Column="1" Grid.Row ="21" VerticalAlignment="Top" Grid.ColumnSpan="2" TextWrapping="Wrap" Text="Displays Players that were online at the given date and time." Margin="5"/>
+        <TextBlock Grid.Column="0" Grid.Row ="12" VerticalAlignment="Top" Text="!connectlog admin reload" Margin="5" />
+        <TextBlock Grid.Column="1" Grid.Row ="12" VerticalAlignment="Top" Grid.ColumnSpan="2" TextWrapping="Wrap" Text="Reloads the log entries from file system." Margin="5"/>
+        <TextBlock Grid.Column="0" Grid.Row ="13" VerticalAlignment="Top" Text="!connectlog admin open" Margin="5" />
+        <TextBlock Grid.Column="1" Grid.Row ="13" VerticalAlignment="Top" Grid.ColumnSpan="2" TextWrapping="Wrap" Text="Lists all open Sessions (including logged in players)." Margin="5"/>
+        <TextBlock Grid.Column="0" Grid.Row ="14" VerticalAlignment="Top" Text="!connectlog admin fix" Margin="5" />
+        <TextBlock Grid.Column="1" Grid.Row ="14" VerticalAlignment="Top" Grid.ColumnSpan="2" TextWrapping="Wrap" Text="Fixes all open Sessions (excluding currently logged in players)." Margin="5"/>
+        <TextBlock Grid.Column="0" Grid.Row ="15" VerticalAlignment="Top" Text="!connectlog playtime &lt;Playername or SteamID>" Margin="5" />
+        <TextBlock Grid.Column="1" Grid.Row ="15" VerticalAlignment="Top" Grid.ColumnSpan="2" TextWrapping="Wrap" Text="Lists the playtimes for the specified player." Margin="5"/>
+        <TextBlock Grid.Column="0" Grid.Row ="16" VerticalAlignment="Top" Text="!connectlog ips &lt;Playername or SteamID>" Margin="5" />
+        <TextBlock Grid.Column="1" Grid.Row ="16" VerticalAlignment="Top" Grid.ColumnSpan="2" TextWrapping="Wrap" Text="Lists all IPs the specified player has connected from." Margin="5"/>
+        <TextBlock Grid.Column="0" Grid.Row ="17" VerticalAlignment="Top" Text="!connectlog names &lt;Playername or SteamID>" Margin="5" />
+        <TextBlock Grid.Column="1" Grid.Row ="17" VerticalAlignment="Top" Grid.ColumnSpan="2" TextWrapping="Wrap" Text="Lists all names the player has connected with." Margin="5"/>
+        <TextBlock Grid.Column="0" Grid.Row ="18" VerticalAlignment="Top" Text="!connectlog sessions &lt;Playername or SteamID>" Margin="5" />
+        <TextBlock Grid.Column="1" Grid.Row ="18" VerticalAlignment="Top" Grid.ColumnSpan="2" TextWrapping="Wrap" Text="Lists session information of the player." Margin="5"/>
+        <TextBlock Grid.Column="0" Grid.Row ="19" VerticalAlignment="Top" Text="!connectlog find &lt;Player Name Pattern>" Margin="5" />
+        <TextBlock Grid.Column="1" Grid.Row ="19" VerticalAlignment="Top" Grid.ColumnSpan="2" TextWrapping="Wrap" Text="Supports wildcards (*), looks up IDs etc. for players matching the pattern." Margin="5"/>
+        <TextBlock Grid.Column="0" Grid.Row ="20" VerticalAlignment="Top" Text="!connectlog multis [show 0.0.0.0 IPs (true|false)]" Margin="5" />
+        <TextBlock Grid.Column="1" Grid.Row ="20" VerticalAlignment="Top" Grid.ColumnSpan="2" TextWrapping="Wrap" Text="Displays Players that connected from the same IP." Margin="5"/>
+        <TextBlock Grid.Column="0" Grid.Row ="21" VerticalAlignment="Top" Text="!connectlog online date [day] [month] [year]" Margin="5" />
+        <TextBlock Grid.Column="1" Grid.Row ="21" VerticalAlignment="Top" Grid.ColumnSpan="2" TextWrapping="Wrap" Text="Displays Players that connected on the given date." Margin="5"/>
+        <TextBlock Grid.Column="0" Grid.Row ="22" VerticalAlignment="Top" Text="!connectlog online time [hour] [minute] [second] [day] [month] [year]" Margin="5" />
+        <TextBlock Grid.Column="1" Grid.Row ="22" VerticalAlignment="Top" Grid.ColumnSpan="2" TextWrapping="Wrap" Text="Displays Players that were online at the given date and time." Margin="5"/>
     </Grid>
 </UserControl>

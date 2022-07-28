@@ -37,6 +37,7 @@ namespace ALE_ConnectionLog {
         private Persistent<ConnectionLogConfig> _config;
 
         private ConnectionLogManager _connectionLogManager;
+
         public ConnectionLogManager ConnectionLogManager => _connectionLogManager;
 
         public CooldownManager ConfirmationCooldownManager { get; } = new CooldownManager();
@@ -144,7 +145,18 @@ namespace ALE_ConnectionLog {
             }
         }
 
-       private void PlayerJoined(IPlayer obj) {
+        internal void Reload() {
+
+            var newEntries = _connectionLogManager.Init();
+
+            newEntries.CloseMemorizedSessions();
+
+            LogEntries = newEntries;
+
+            Log.Info("LogEntries reloaded!");
+        }
+
+        private void PlayerJoined(IPlayer obj) {
 
             ulong SteamId = obj.SteamId;
             string Name = obj.Name;
