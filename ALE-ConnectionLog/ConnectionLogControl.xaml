@@ -93,7 +93,7 @@
         <TextBlock Grid.Column="0" Grid.Row ="20" VerticalAlignment="Top" Text="!connectlog multis [show 0.0.0.0 IPs=false]" Margin="5" />
         <TextBlock Grid.Column="1" Grid.Row ="20" VerticalAlignment="Top" Grid.ColumnSpan="2" TextWrapping="Wrap" Text="Displays Players that connected from the same IP." Margin="5"/>
         <TextBlock Grid.Column="0" Grid.Row ="21" VerticalAlignment="Top" Text="!connectlog sus [marginOfErrorPcu=0] [ignoreDays=0] [ignoreNoIdentity=true]" Margin="5" />
-        <TextBlock Grid.Column="1" Grid.Row ="21" VerticalAlignment="Top" Grid.ColumnSpan="2" TextWrapping="Wrap" Text="Displays Players that were online at the given date and time." Margin="5"/>
+        <TextBlock Grid.Column="1" Grid.Row ="21" VerticalAlignment="Top" Grid.ColumnSpan="2" TextWrapping="Wrap" Text="Shows suspicious players, which have now much higher PCU than when they last logged in." Margin="5"/>
 
         <TextBlock Grid.Column="0" Grid.Row ="22" VerticalAlignment="Top" Text="!connectlog online date [day=0] [month=0] [year=0]" Margin="5" />
         <TextBlock Grid.Column="1" Grid.Row ="22" VerticalAlignment="Top" Grid.ColumnSpan="2" TextWrapping="Wrap" Text="Displays Players that connected on the given date." Margin="5"/>

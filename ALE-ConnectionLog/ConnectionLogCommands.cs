@@ -562,12 +562,13 @@ namespace ALE_ConnectionLog {
                 if (allKnownSteamIdsToIp.Count <= 1)
                     continue;
 
+                sb.AppendLine(ip);
+
                 foreach (var dateEntry in ipEntry.Value) {
 
                     string date = dateEntry.Key;
                     HashSet<ulong> steamIds = dateEntry.Value;
 
-                    sb.AppendLine(ip);
                     sb.AppendLine("   " + date);
 
                     foreach (ulong steamId in steamIds) {
@@ -586,7 +587,7 @@ namespace ALE_ConnectionLog {
             Respond(sb, "Potential Multiaccounts", "Shows who shared IPs and when");
         }
 
-        [Command("sus", "Shows suspicious players. Who have now much higher PCU than when they last logged in.")]
+        [Command("sus", "Shows suspicious players, which have now much higher PCU than when they last logged in.")]
         [Permission(MyPromoteLevel.Admin)]
         public void Sus(int marginOfError = 0, int ignoreDays = 0, bool ignoreMissingIdentities = true) {
 
