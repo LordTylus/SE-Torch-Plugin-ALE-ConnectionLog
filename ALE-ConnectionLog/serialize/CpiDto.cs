@@ -10,6 +10,8 @@ namespace ALE_ConnectionLog.serialize {
         public ulong SID { get; set; }
         public long TPT { get; set; } = 0;
 
+        public string LN { get; set; }
+
         [Obsolete("Use LPS instead. LS is just for conversion/backwards compatibility.")]
         public DateTime LS { get; set; }
         public PsDto LPS { get; set; }

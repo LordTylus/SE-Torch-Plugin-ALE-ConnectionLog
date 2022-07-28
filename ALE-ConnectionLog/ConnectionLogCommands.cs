@@ -571,7 +571,6 @@ namespace ALE_ConnectionLog {
                             foreach(ulong steamId in steamIds) {
 
                                 long identityId = MySession.Static.Players.TryGetIdentityId(steamId);
-
                                 MyIdentity identity = PlayerUtils.GetIdentityById(identityId);
 
                                 if(identity == null)
@@ -585,6 +584,86 @@ namespace ALE_ConnectionLog {
             }
 
             Respond(sb, "Potential Multiaccounts", "Shows who shared IPs and when");
+        }
+
+        [Command("sus", "Shows suspicious players. Who have now much higher PCU than when they last logged in.")]
+        [Permission(MyPromoteLevel.Admin)]
+        public void Sus(int marginOfError = 0, int ignoreDays = 0, bool ignoreMissingIdentities = true) {
+
+            StringBuilder sb = new StringBuilder();
+
+            Dictionary<string, Dictionary<string, HashSet<ulong>>> ipToDateToSteamDict = new Dictionary<string, Dictionary<string, HashSet<ulong>>>();
+
+            var connectionLog = Plugin.LogEntries;
+
+            int count = 0;
+
+            foreach (var playerInfo in connectionLog.GetPlayerInfos()) {
+
+                long identityId = MySession.Static.Players.TryGetIdentityId(playerInfo.SteamId);
+                MyIdentity identity = PlayerUtils.GetIdentityById(identityId);
+
+                bool identityPresent = identity != null;
+
+                if (ignoreMissingIdentities && !identityPresent)
+                    continue;
+
+                var lastSeen = playerInfo.LastSeen;
+
+                bool identityFine = identityId == lastSeen.IdentityId;
+
+                int currentPcu = identity.BlockLimits.PCUBuilt;
+                int lastSeenPcu = lastSeen.PCU;
+
+                int pcuDifference = currentPcu - lastSeenPcu - marginOfError;
+
+                bool pcuFine = pcuDifference <= 0;
+
+                if (!identityFine || !pcuFine || !identityPresent) {
+
+                    var lastEntry = playerInfo.GetLatestEntry();
+
+                    /* Ignore logged in players lul */
+                    if (lastEntry != null && lastEntry.Logout == null)
+                        continue;
+
+                    if (!identityPresent) {
+
+                        sb.AppendLine(playerInfo.SteamId + " " + playerInfo.LastName);
+                        sb.AppendLine("   Last Seen: " + playerInfo.LastSeen.SnapshotTime.ToString("yyyy-MM-dd  HH:mm:ss"));
+
+                        sb.AppendLine("   Has no Identity anymore.");
+
+                    } else {
+
+                        var lastSeenDate = PlayerUtils.GetLastSeenDate(identity);
+
+                        if (DateTime.Now.AddDays(-ignoreDays) > lastSeenDate)
+                            continue;
+
+                        sb.AppendLine(playerInfo.SteamId + " " + playerInfo.LastName);
+
+                        sb.AppendLine("   Last Seen: " + lastSeenDate.ToString("yyyy-MM-dd  HH:mm:ss"));
+
+                        string faction = FactionUtils.GetPlayerFactionTag(identity.IdentityId);
+
+                        if (faction == "")
+                            sb.AppendLine("   #" + identity.IdentityId + "   " + identity.DisplayName);
+                        else
+                            sb.AppendLine("   #" + identity.IdentityId + "   " + identity.DisplayName + " [" + faction + "]");
+
+                        sb.AppendLine("   Used to have " + lastSeenPcu + " but now has " + currentPcu + " (" + (currentPcu - lastSeenPcu) + ")");
+                        sb.AppendLine();
+                    }
+
+                    count++;
+                }
+            }
+
+            sb.AppendLine();
+            sb.AppendLine("Found a total of " + count + " suspicious accounts!");
+
+            Respond(sb, "Suspicious Accounts", "Shows accounts who have higher PCU than when they were last seen.");
         }
 
         private static void AddLastSeenToSb(StringBuilder sb, ulong steamId) {

@@ -80,6 +80,7 @@ namespace ALE_ConnectionLog {
 
                 CpiDto cpiDto = new CpiDto();
                 cpiDto.SID = connectionPlayerInfo.SteamId;
+                cpiDto.LN = connectionPlayerInfo.LastName;
                 cpiDto.AKN = new HashSet<string>(connectionPlayerInfo.GetNames());
                 
                 if(connectionPlayerInfo.LastSeen != null) {
@@ -175,6 +176,9 @@ namespace ALE_ConnectionLog {
                 }
 
                 infoForPlayer.TotalPlayTime = logDto.TPT;
+
+                if (logDto.LN != null)
+                    infoForPlayer.LastName = logDto.LN;
 
                 infoForPlayer.SetNames(logDto.AKN);
 

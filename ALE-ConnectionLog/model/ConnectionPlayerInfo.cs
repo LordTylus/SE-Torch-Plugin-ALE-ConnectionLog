@@ -9,6 +9,8 @@ namespace ALE_ConnectionLog.model {
         public static readonly Logger Log = LogManager.GetCurrentClassLogger();
 
         public ulong SteamId { get; }
+
+        public string LastName { get; set; } = "";
         
         public PlayerSnapshot LastSeen { get; set; } = PlayerSnapshotFactory.CreateEmpty();
 
@@ -24,6 +26,7 @@ namespace ALE_ConnectionLog.model {
         internal void Login(string name, string ip, ConnectionLogConfig config) {
 
             _allKnownNames.Add(name);
+            LastName = name;
 
             if (!config.SaveIPs)
                 ip = "0.0.0.0";
