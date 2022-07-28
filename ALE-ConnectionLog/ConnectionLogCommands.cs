@@ -594,6 +594,8 @@ namespace ALE_ConnectionLog {
 
             Dictionary<string, Dictionary<string, HashSet<ulong>>> ipToDateToSteamDict = new Dictionary<string, Dictionary<string, HashSet<ulong>>>();
 
+            var nowWithMargin = DateTime.Now.AddDays(-ignoreDays);
+
             var connectionLog = Plugin.LogEntries;
 
             int count = 0;
@@ -614,8 +616,10 @@ namespace ALE_ConnectionLog {
 
                     sb.AppendLine(playerInfo.SteamId + " " + playerInfo.LastName);
                     sb.AppendLine("   Last Seen: " + lastSeen.SnapshotTime.ToString("yyyy-MM-dd  HH:mm:ss"));
+                    sb.AppendLine("   Total Playtime: " + playerInfo.TotalPlayTime + " minutes");
 
                     sb.AppendLine("   Has no Identity anymore.");
+                    sb.AppendLine();
 
                     continue;
                 }
@@ -625,7 +629,7 @@ namespace ALE_ConnectionLog {
 
                 int pcuDifference = currentPcu - lastSeenPcu - marginOfError;
 
-                bool pcuFine = pcuDifference > 0;
+                bool pcuFine = pcuDifference <= 0;
 
                 if (!pcuFine) {
 
@@ -637,12 +641,13 @@ namespace ALE_ConnectionLog {
 
                     var lastSeenDate = PlayerUtils.GetLastSeenDate(identity);
 
-                    if (DateTime.Now.AddDays(-ignoreDays) > lastSeenDate)
+                    if (nowWithMargin < lastSeenDate)
                         continue;
 
                     sb.AppendLine(playerInfo.SteamId + " " + playerInfo.LastName);
 
                     sb.AppendLine("   Last Seen: " + lastSeenDate.ToString("yyyy-MM-dd  HH:mm:ss"));
+                    sb.AppendLine("   Total Playtime: " + playerInfo.TotalPlayTime + " minutes");
 
                     string faction = FactionUtils.GetPlayerFactionTag(identity.IdentityId);
 
