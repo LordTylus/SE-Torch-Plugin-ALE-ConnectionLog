@@ -81,7 +81,23 @@ namespace ALE_ConnectionLog {
                 CpiDto cpiDto = new CpiDto();
                 cpiDto.SID = connectionPlayerInfo.SteamId;
                 cpiDto.AKN = new HashSet<string>(connectionPlayerInfo.GetNames());
-                cpiDto.LS = connectionPlayerInfo.LastSeen;
+                
+                if(connectionPlayerInfo.LastSeen != null) {
+
+                    var lastSeenSnapshot = connectionPlayerInfo.LastSeen;
+
+                    PsDto lastSeenDto = new PsDto() {
+                        IId = lastSeenSnapshot.IdentityId,
+                        Blk = lastSeenSnapshot.BlockCount,
+                        GC = lastSeenSnapshot.GridCount,
+                        PCU = lastSeenSnapshot.PCU,
+                        F = lastSeenSnapshot.Faction,
+                        ST = lastSeenSnapshot.SnapshotTime
+                    };
+
+                    cpiDto.LPS = lastSeenDto;
+                }
+                
                 cpiDto.TPT = connectionPlayerInfo.TotalPlayTime;
 
                 foreach(var entry in connectionPlayerInfo.GetEntries()) {
@@ -141,7 +157,23 @@ namespace ALE_ConnectionLog {
 
                 var infoForPlayer = connectionLog.GetInfoForPlayer(logDto.SID);
 
-                infoForPlayer.LastSeen = logDto.LS;
+                if(logDto.LPS != null) {
+
+                    var lastSeenDto = logDto.LPS;
+
+                    var lastSeenSnapshot = new PlayerSnapshot(
+                        lastSeenDto.IId, lastSeenDto.PCU, lastSeenDto.Blk, lastSeenDto.GC, lastSeenDto.F, lastSeenDto.ST);
+
+                    infoForPlayer.LastSeen = lastSeenSnapshot;
+                
+                } else {
+
+                    if (logDto.LS != null)
+                        infoForPlayer.LastSeen = PlayerSnapshotFactory.CreateEmpty(logDto.LS);
+                    else
+                        infoForPlayer.LastSeen = PlayerSnapshotFactory.CreateEmpty();
+                }
+
                 infoForPlayer.TotalPlayTime = logDto.TPT;
 
                 infoForPlayer.SetNames(logDto.AKN);

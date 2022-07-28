@@ -9,7 +9,9 @@ namespace ALE_ConnectionLog.model {
         public static readonly Logger Log = LogManager.GetCurrentClassLogger();
 
         public ulong SteamId { get; }
-        public DateTime LastSeen { get; set; }
+        
+        public PlayerSnapshot LastSeen { get; set; } = PlayerSnapshotFactory.CreateEmpty();
+
         public long TotalPlayTime { get; set; }
 
         private MyConcurrentHashSet<string> _allKnownNames = new MyConcurrentHashSet<string>();
@@ -23,8 +25,6 @@ namespace ALE_ConnectionLog.model {
 
             _allKnownNames.Add(name);
 
-            LastSeen = DateTime.Now;
-
             if (!config.SaveIPs)
                 ip = "0.0.0.0";
 
@@ -33,6 +33,8 @@ namespace ALE_ConnectionLog.model {
             if (snapshot == null)
                 snapshot = PlayerSnapshotFactory.CreateEmpty();
 
+            LastSeen = snapshot;
+
             ConnectionEntry entry = new ConnectionEntry(ip, name, snapshot);
 
             _connectionEntries.Insert(0, entry);
@@ -40,8 +42,6 @@ namespace ALE_ConnectionLog.model {
 
         internal void ForceLogout(ConnectionEntry entry, bool sessionUnloading) {
             
-            LastSeen = DateTime.Now;
-
             if (entry == null)
                 return;
 
@@ -69,6 +69,8 @@ namespace ALE_ConnectionLog.model {
 
                 TotalPlayTime += (long)(snapshot.SnapshotTime - entry.Login.SnapshotTime).TotalSeconds;
             }
+
+            LastSeen = snapshot;
 
             entry.SetLogout(snapshot, sessionUnloading);
         }
