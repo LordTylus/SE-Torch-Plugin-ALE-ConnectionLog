@@ -26,6 +26,11 @@ namespace ALE_ConnectionLog.model {
             _playerInfos.Clear();
         }
 
+        internal void ClearSessions() {
+            foreach (var playerInfo in _playerInfos.Values)
+                playerInfo.ClearSessions();
+        }
+
         public ConnectionPlayerInfo GetInfoForPlayer(ulong steamId) {
 
             if(!_playerInfos.TryGetValue(steamId, out ConnectionPlayerInfo info)) {

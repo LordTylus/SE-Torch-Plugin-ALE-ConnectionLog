@@ -23,6 +23,10 @@ namespace ALE_ConnectionLog.model {
             this.SteamId = SteamId;
         }
 
+        internal void ClearSessions() {
+            _connectionEntries.Clear();
+        }
+
         internal void Login(string name, string ip, ConnectionLogConfig config) {
 
             _allKnownNames.Add(name);

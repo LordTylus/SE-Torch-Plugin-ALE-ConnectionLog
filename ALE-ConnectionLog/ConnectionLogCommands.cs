@@ -44,13 +44,13 @@ namespace ALE_ConnectionLog {
             Context.Respond("Done!");
         }
 
-        [Command("admin wipe", "Deletes all Logs.")]
+        [Command("admin wipe all", "Deletes all Logs.")]
         [Permission(MyPromoteLevel.Owner)]
         public void Wipe() {
 
             var steamId = new SteamIdCooldownKey(PlayerUtils.GetSteamId(Context.Player));
 
-            if (!CheckConformation(steamId, "wipe"))
+            if (!CheckConformation(steamId, "wipe all"))
                 return;
 
             var connectionLog = Plugin.LogEntries;
@@ -61,6 +61,25 @@ namespace ALE_ConnectionLog {
             LogEveryoneInAgain(connectionLog);
 
             Context.Respond("Deleted Logs for "+ countPlayers + " players!");
+        }
+
+        [Command("admin wipe sessions", "Deletes all Session Data (good if you want to keep playtime after server reset).")]
+        [Permission(MyPromoteLevel.Owner)]
+        public void CleanSessions() {
+
+            var steamId = new SteamIdCooldownKey(PlayerUtils.GetSteamId(Context.Player));
+
+            if (!CheckConformation(steamId, "wipe sessions"))
+                return;
+
+            var connectionLog = Plugin.LogEntries;
+            int countPlayers = connectionLog.GetPlayerCount();
+
+            connectionLog.ClearSessions();
+
+            LogEveryoneInAgain(connectionLog);
+
+            Context.Respond("Deleted Logs for " + countPlayers + " players!");
         }
 
         [Command("admin logoutall", "Logs all Players out.")]
@@ -132,6 +151,9 @@ namespace ALE_ConnectionLog {
 
                 var latestEntry = playerInfo.GetLatestEntry();
 
+                if (latestEntry == null)
+                    continue;
+
                 foreach (var entry in playerInfo.GetEntries()) {
 
                     /* skip current */
@@ -165,7 +187,7 @@ namespace ALE_ConnectionLog {
                 int playtimeCorrection = 0;
 
                 /* Add playtime since last login, if player is logged in */
-                if(latestEntry.Logout == null)
+                if(latestEntry != null && latestEntry.Logout == null)
                     playtimeCorrection = (int) (DateTime.Now - latestEntry.Login.SnapshotTime).TotalSeconds;
                 
                 playerDictionary[playerInfo] = playerInfo.TotalPlayTime + playtimeCorrection;
@@ -190,6 +212,8 @@ namespace ALE_ConnectionLog {
 
                 string name;
 
+                DateTime lastSeen;
+
                 if (identity != null) {
 
                     string faction = FactionUtils.GetPlayerFactionTag(identity.IdentityId);
@@ -198,12 +222,16 @@ namespace ALE_ConnectionLog {
                         name = identity.DisplayName;
                     else
                         name = identity.DisplayName + " [" + faction + "]";
-                
+
+                    lastSeen = PlayerUtils.GetLastSeenDate(identity);
+
                 } else {
+
                     name = key.LastName;
+                    lastSeen = key.LastSeen.SnapshotTime;
                 }
 
-                sb.AppendLine(FormatTime(entry.Value) + " " + key.SteamId + " " + name + " " + key.LastSeen);
+                sb.AppendLine(FormatTime(entry.Value) + " " + key.SteamId + " " + name + " " + lastSeen.ToString("yyyy-MM-dd  HH:mm:ss"));
             }
 
             Respond(sb, "Top Playtime", "Shows "+ top +" players");
