@@ -185,7 +185,25 @@ namespace ALE_ConnectionLog {
                 var entry = playerList[i];
                 var key = entry.Key;
 
-                sb.AppendLine(FormatTime(entry.Value) + " " + key.SteamId + " " + key.LastName + " " + key.LastSeen);
+                long identityId = MySession.Static.Players.TryGetIdentityId(key.SteamId);
+                var identity = MySession.Static.Players.TryGetIdentity(identityId);
+
+                string name;
+
+                if (identity != null) {
+
+                    string faction = FactionUtils.GetPlayerFactionTag(identity.IdentityId);
+
+                    if (faction == "")
+                        name = identity.DisplayName;
+                    else
+                        name = identity.DisplayName + " [" + faction + "]";
+                
+                } else {
+                    name = key.LastName;
+                }
+
+                sb.AppendLine(FormatTime(entry.Value) + " " + key.SteamId + " " + name + " " + key.LastSeen);
             }
 
             Respond(sb, "Top Playtime", "Shows "+ top +" players");
