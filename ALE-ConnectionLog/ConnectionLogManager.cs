@@ -59,6 +59,7 @@ namespace ALE_ConnectionLog {
                 var logFile = Path.Combine(storagePath, CONNECTION_LOG_FILE_NAME);
 
                 connectionLog.CleanupEntriesOlderThan(config);
+                connectionLog.LastSaved = DateTime.Now;
 
                 ConnectionLogDto connectionLogDto = Convert(connectionLog);
 
@@ -75,6 +76,7 @@ namespace ALE_ConnectionLog {
         private ConnectionLogDto Convert(ConnectionLog connectionLog) {
 
             var connectionLogDto = new ConnectionLogDto();
+            connectionLogDto.LSV = connectionLog.LastSaved;
 
             foreach(var connectionPlayerInfo in connectionLog.GetPlayerInfos()) {
 
@@ -153,8 +155,9 @@ namespace ALE_ConnectionLog {
         private ConnectionLog Convert(ConnectionLogDto data) {
 
             var connectionLog = new ConnectionLog();
+            connectionLog.LastSaved = data.LSV;
 
-            foreach(var logDto in data.CLE) {
+            foreach (var logDto in data.CLE) {
 
                 var infoForPlayer = connectionLog.GetInfoForPlayer(logDto.SID);
 

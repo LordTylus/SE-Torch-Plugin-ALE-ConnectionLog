@@ -35,7 +35,7 @@ namespace ALE_ConnectionLog.model {
             if (!config.SaveIPs)
                 ip = "0.0.0.0";
 
-            var snapshot = PlayerSnapshotFactory.Create(SteamId);
+            var snapshot = PlayerSnapshotFactory.Create(SteamId, DateTime.Now);
 
             if (snapshot == null)
                 snapshot = PlayerSnapshotFactory.CreateEmpty();
@@ -47,18 +47,18 @@ namespace ALE_ConnectionLog.model {
             _connectionEntries.Insert(0, entry);
         }
 
-        internal void ForceLogout(ConnectionEntry entry, bool sessionUnloading) {
+        internal void ForceLogout(ConnectionEntry entry, bool sessionUnloading, DateTime logoutTime) {
             
             if (entry == null)
                 return;
 
-            var snapshot = PlayerSnapshotFactory.Create(SteamId);
+            var snapshot = PlayerSnapshotFactory.Create(SteamId, logoutTime);
 
             if (snapshot == null) {
 
                 Log.Warn("Could not create logout Snapshot for " + SteamId + " close it manually!");
 
-                snapshot = PlayerSnapshotFactory.Create(entry.Login);
+                snapshot = PlayerSnapshotFactory.Create(entry.Login, logoutTime);
             }
 
             if (snapshot == null) {
@@ -83,7 +83,7 @@ namespace ALE_ConnectionLog.model {
         }
 
         internal void Logout(bool sessionUnloading) {
-            ForceLogout(GetLatestEntry(), sessionUnloading);
+            ForceLogout(GetLatestEntry(), sessionUnloading, DateTime.Now);
         }
 
         public ConnectionEntry GetLatestEntry() {

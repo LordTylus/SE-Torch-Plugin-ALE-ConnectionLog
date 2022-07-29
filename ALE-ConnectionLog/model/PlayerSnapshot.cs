@@ -16,10 +16,6 @@ namespace ALE_ConnectionLog.model {
 
         public DateTime SnapshotTime { get; }
 
-        public PlayerSnapshot(long IdentityId, int PCU, int BlockCount, int GridCount, string Faction) 
-            : this(IdentityId, PCU, BlockCount, GridCount, Faction, DateTime.Now) {
-        }
-
         public PlayerSnapshot(long IdentityId, int PCU, int BlockCount, int GridCount, string Faction, DateTime SnapshotTime) {
             this.IdentityId = IdentityId;
             this.PCU = PCU;

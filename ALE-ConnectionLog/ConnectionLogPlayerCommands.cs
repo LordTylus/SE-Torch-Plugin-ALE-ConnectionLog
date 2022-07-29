@@ -1,4 +1,5 @@
 ﻿using ALE_ConnectionLog.model;
+using System;
 using System.Text;
 using Torch.Commands;
 using Torch.Commands.Permissions;
@@ -29,7 +30,7 @@ namespace ALE_ConnectionLog {
             sb.AppendLine("Last known data vs current");
             sb.AppendLine("--------------------------");
             sb.AppendLine("Name: " + playerInfo.LastName);
-            Utilities.AddSessionToSb(sb, playerInfo.LastSeen, PlayerSnapshotFactory.Create(playerInfo.SteamId), "");
+            Utilities.AddSessionToSb(sb, playerInfo.LastSeen, PlayerSnapshotFactory.Create(playerInfo.SteamId, DateTime.Now), "");
             sb.AppendLine();
 
             sb.AppendLine("Total playtime: " + Utilities.FormatTime(playerInfo.TotalPlayTime));

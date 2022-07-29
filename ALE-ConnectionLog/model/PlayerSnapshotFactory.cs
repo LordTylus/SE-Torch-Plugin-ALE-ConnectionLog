@@ -16,7 +16,7 @@ namespace ALE_ConnectionLog.model {
 
             string FactionTag = "";
 
-            return new PlayerSnapshot(IdentityID, PCU, Blocks, GridCount, FactionTag);
+            return new PlayerSnapshot(IdentityID, PCU, Blocks, GridCount, FactionTag, DateTime.Now);
         }
 
         public static PlayerSnapshot CreateEmpty(DateTime date) {
@@ -32,7 +32,7 @@ namespace ALE_ConnectionLog.model {
             return new PlayerSnapshot(IdentityID, PCU, Blocks, GridCount, FactionTag, date);
         }
 
-        public static PlayerSnapshot Create(ulong SteamId) {
+        public static PlayerSnapshot Create(ulong SteamId, DateTime dateTime) {
 
             long IdentityID = MySession.Static.Players.TryGetIdentityId(SteamId);
 
@@ -46,10 +46,10 @@ namespace ALE_ConnectionLog.model {
 
             string FactionTag = FactionUtils.GetPlayerFactionTag(IdentityID);
 
-            return new PlayerSnapshot(IdentityID, PCU, Blocks, GridCount, FactionTag);
+            return new PlayerSnapshot(IdentityID, PCU, Blocks, GridCount, FactionTag, dateTime);
         }
 
-        internal static PlayerSnapshot Create(PlayerSnapshot login) {
+        internal static PlayerSnapshot Create(PlayerSnapshot login, DateTime dateTime) {
 
             if (login == null)
                 return null;
@@ -62,7 +62,7 @@ namespace ALE_ConnectionLog.model {
 
             string FactionTag = login.Faction;
 
-            return new PlayerSnapshot(IdentityID, PCU, Blocks, GridCount, FactionTag);
+            return new PlayerSnapshot(IdentityID, PCU, Blocks, GridCount, FactionTag, dateTime);
         }
 
         internal static PlayerSnapshot CreateCopy(PlayerSnapshot snapshot) {

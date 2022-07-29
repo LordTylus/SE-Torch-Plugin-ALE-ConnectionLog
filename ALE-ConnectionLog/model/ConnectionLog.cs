@@ -11,6 +11,8 @@ namespace ALE_ConnectionLog.model {
 
         public static readonly Logger Log = LogManager.GetCurrentClassLogger();
 
+        public DateTime LastSaved { get; set; } = DateTime.Now;
+
         private readonly Dictionary<ulong, ConnectionPlayerInfo> _playerInfos = new Dictionary<ulong, ConnectionPlayerInfo>();
         private readonly Dictionary<ulong, ConnectionEntry> memorizedEntries = new Dictionary<ulong, ConnectionEntry>();
 
@@ -82,7 +84,7 @@ namespace ALE_ConnectionLog.model {
                 var playerInfo = GetInfoForPlayer(steamId);
                 var rememeredEntry = entry.Value;
 
-                playerInfo.ForceLogout(rememeredEntry, true);
+                playerInfo.ForceLogout(rememeredEntry, true, LastSaved);
             }
 
             if(memorizedEntries.Count > 0)
