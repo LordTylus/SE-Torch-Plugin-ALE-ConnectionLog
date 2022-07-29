@@ -346,10 +346,8 @@ namespace ALE_ConnectionLog {
             sb.AppendLine();
 
             sb.AppendLine("Total playtime: " + FormatTime(playerInfo.TotalPlayTime));
-            sb.AppendLine("--------------------------");
             sb.AppendLine();
 
-            sb.AppendLine();
             sb.AppendLine("Sessions");
             sb.AppendLine("--------------------------");
             sb.AppendLine();
