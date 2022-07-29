@@ -205,7 +205,7 @@ namespace ALE_ConnectionLog {
             AddSessionToSb(sb, playerInfo.LastSeen, PlayerSnapshotFactory.Create(playerInfo.SteamId), "");
             sb.AppendLine();
 
-            sb.AppendLine("Total playtime: " + (int)(playerInfo.TotalPlayTime / 60) + " minutes.");
+            sb.AppendLine("Total playtime: " + FormatTime(playerInfo.TotalPlayTime));
             sb.AppendLine("--------------------------");
             sb.AppendLine();
 
@@ -287,6 +287,10 @@ namespace ALE_ConnectionLog {
             sb.AppendLine("--------------------------");
             sb.AppendLine("Name: " + playerInfo.LastName);
             AddSessionToSb(sb, playerInfo.LastSeen, PlayerSnapshotFactory.Create(playerInfo.SteamId), "");
+            sb.AppendLine();
+
+            sb.AppendLine("Total playtime: " + FormatTime(playerInfo.TotalPlayTime));
+            sb.AppendLine("--------------------------");
             sb.AppendLine();
 
             sb.AppendLine();
@@ -633,7 +637,7 @@ namespace ALE_ConnectionLog {
 
                     sb.AppendLine(playerInfo.SteamId + " " + playerInfo.LastName);
                     sb.AppendLine("   Last Seen: " + lastSeen.SnapshotTime.ToString("yyyy-MM-dd  HH:mm:ss"));
-                    sb.AppendLine("   Total Playtime: " + playerInfo.TotalPlayTime + " minutes");
+                    sb.AppendLine("   Total Playtime: " + FormatTime(playerInfo.TotalPlayTime));
 
                     sb.AppendLine("   Has no Identity anymore.");
                     sb.AppendLine();
@@ -664,7 +668,7 @@ namespace ALE_ConnectionLog {
                     sb.AppendLine(playerInfo.SteamId + " " + playerInfo.LastName);
 
                     sb.AppendLine("   Last Seen: " + lastSeenDate.ToString("yyyy-MM-dd  HH:mm:ss"));
-                    sb.AppendLine("   Total Playtime: " + playerInfo.TotalPlayTime + " minutes");
+                    sb.AppendLine("   Total Playtime: " + FormatTime(playerInfo.TotalPlayTime));
 
                     string faction = FactionUtils.GetPlayerFactionTag(identity.IdentityId);
 
@@ -759,6 +763,27 @@ namespace ALE_ConnectionLog {
             }
 
             sb.AppendLine(" minutes");
+        }
+
+        public static string FormatTime(long timeInSeconds) {
+
+            long timeInMinutes = timeInSeconds / 60;
+
+            long hours = timeInMinutes / 60;
+            long minutes = timeInMinutes % 60;
+
+            if (hours == 0 && minutes == 0)
+                return "none";
+
+            string returnString = "";
+
+            if (hours > 0)
+                returnString += hours + "h ";
+
+            if(minutes > 0)
+                returnString += minutes + "m ";
+
+            return returnString;
         }
 
         public static bool Matches(string input, string pattern) {
