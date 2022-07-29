@@ -51,6 +51,19 @@ namespace ALE_ConnectionLog {
                 sb.AppendLine(prefix + "Grids: " + referenceSnapshot.GridCount);
         }
 
+        internal static long CalcTotalPlayTime(ConnectionPlayerInfo playerInfo) {
+            
+            var latestEntry = playerInfo.GetLatestEntry();
+
+            long playtimeCorrection = 0;
+
+            /* Add playtime since last login, if player is logged in */
+            if (latestEntry != null && latestEntry.Logout == null)
+                playtimeCorrection = (long) (DateTime.Now - latestEntry.Login.SnapshotTime).TotalSeconds;
+
+            return playerInfo.TotalPlayTime + playtimeCorrection;
+        }
+
         public static void AddLastSeenToSb(StringBuilder sb, ulong steamId) {
 
             long identityId = MySession.Static.Players.TryGetIdentityId(steamId);

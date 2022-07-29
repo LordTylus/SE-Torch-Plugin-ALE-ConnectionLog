@@ -33,7 +33,7 @@ namespace ALE_ConnectionLog {
             Utilities.AddSessionToSb(sb, playerInfo.LastSeen, PlayerSnapshotFactory.Create(playerInfo.SteamId, DateTime.Now), "");
             sb.AppendLine();
 
-            sb.AppendLine("Total playtime: " + Utilities.FormatTime(playerInfo.TotalPlayTime));
+            sb.AppendLine("Total playtime: " + Utilities.FormatTime(Utilities.CalcTotalPlayTime(playerInfo)));
             sb.AppendLine("--------------------------");
             sb.AppendLine();
 

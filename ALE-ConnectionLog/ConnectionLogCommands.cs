@@ -25,18 +25,8 @@ namespace ALE_ConnectionLog {
 
             Dictionary<ConnectionPlayerInfo, long> playerDictionary = new Dictionary<ConnectionPlayerInfo, long>();
 
-            foreach (var playerInfo in connectionLog.GetPlayerInfos()) {
-
-                var latestEntry = playerInfo.GetLatestEntry();
-
-                int playtimeCorrection = 0;
-
-                /* Add playtime since last login, if player is logged in */
-                if(latestEntry != null && latestEntry.Logout == null)
-                    playtimeCorrection = (int) (DateTime.Now - latestEntry.Login.SnapshotTime).TotalSeconds;
-                
-                playerDictionary[playerInfo] = playerInfo.TotalPlayTime + playtimeCorrection;
-            }
+            foreach (var playerInfo in connectionLog.GetPlayerInfos())
+                playerDictionary[playerInfo] = Utilities.CalcTotalPlayTime(playerInfo);
 
             var playerList = playerDictionary.ToList();
 
@@ -106,7 +96,7 @@ namespace ALE_ConnectionLog {
             Utilities.AddSessionToSb(sb, playerInfo.LastSeen, PlayerSnapshotFactory.Create(playerInfo.SteamId, DateTime.Now), "");
             sb.AppendLine();
 
-            sb.AppendLine("Total playtime: " + Utilities.FormatTime(playerInfo.TotalPlayTime));
+            sb.AppendLine("Total playtime: " + Utilities.FormatTime(Utilities.CalcTotalPlayTime(playerInfo)));
             sb.AppendLine("--------------------------");
             sb.AppendLine();
 
@@ -190,7 +180,7 @@ namespace ALE_ConnectionLog {
             Utilities.AddSessionToSb(sb, playerInfo.LastSeen, PlayerSnapshotFactory.Create(playerInfo.SteamId, DateTime.Now), "");
             sb.AppendLine();
 
-            sb.AppendLine("Total playtime: " + Utilities.FormatTime(playerInfo.TotalPlayTime));
+            sb.AppendLine("Total playtime: " + Utilities.FormatTime(Utilities.CalcTotalPlayTime(playerInfo)));
             sb.AppendLine();
 
             sb.AppendLine("Sessions");
@@ -536,7 +526,7 @@ namespace ALE_ConnectionLog {
 
                     sb.AppendLine(playerInfo.SteamId + " " + playerInfo.LastName);
                     sb.AppendLine("   Last Seen: " + lastSeen.SnapshotTime.ToString("yyyy-MM-dd  HH:mm:ss"));
-                    sb.AppendLine("   Total Playtime: " + Utilities.FormatTime(playerInfo.TotalPlayTime));
+                    sb.AppendLine("   Total Playtime: " + Utilities.FormatTime(Utilities.CalcTotalPlayTime(playerInfo)));
 
                     sb.AppendLine("   Has no Identity anymore.");
                     sb.AppendLine();
@@ -567,7 +557,7 @@ namespace ALE_ConnectionLog {
                     sb.AppendLine(playerInfo.SteamId + " " + playerInfo.LastName);
 
                     sb.AppendLine("   Last Seen: " + lastSeenDate.ToString("yyyy-MM-dd  HH:mm:ss"));
-                    sb.AppendLine("   Total Playtime: " + Utilities.FormatTime(playerInfo.TotalPlayTime));
+                    sb.AppendLine("   Total Playtime: " + Utilities.FormatTime(Utilities.CalcTotalPlayTime(playerInfo)));
 
                     string faction = FactionUtils.GetPlayerFactionTag(identity.IdentityId);
 
