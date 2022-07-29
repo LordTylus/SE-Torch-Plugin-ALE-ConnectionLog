@@ -158,8 +158,18 @@ namespace ALE_ConnectionLog {
 
             Dictionary<ConnectionPlayerInfo, long> playerDictionary = new Dictionary<ConnectionPlayerInfo, long>();
 
-            foreach (var playerInfo in connectionLog.GetPlayerInfos())
-                playerDictionary[playerInfo] = playerInfo.TotalPlayTime;
+            foreach (var playerInfo in connectionLog.GetPlayerInfos()) {
+
+                var latestEntry = playerInfo.GetLatestEntry();
+
+                int playtimeCorrection = 0;
+
+                /* Add playtime since last login, if player is logged in */
+                if(latestEntry.Logout == null)
+                    playtimeCorrection = (int) (DateTime.Now - latestEntry.Login.SnapshotTime).TotalSeconds;
+                
+                playerDictionary[playerInfo] = playerInfo.TotalPlayTime + playtimeCorrection;
+            }
 
             var playerList = playerDictionary.ToList();
 
@@ -175,7 +185,7 @@ namespace ALE_ConnectionLog {
                 var entry = playerList[i];
                 var key = entry.Key;
 
-                sb.AppendLine(entry.Value + " " + key.SteamId + " " + key.LastName + " " + key.LastSeen);
+                sb.AppendLine(FormatTime(entry.Value) + " " + key.SteamId + " " + key.LastName + " " + key.LastSeen);
             }
 
             Respond(sb, "Top Playtime", "Shows "+ top +" players");
