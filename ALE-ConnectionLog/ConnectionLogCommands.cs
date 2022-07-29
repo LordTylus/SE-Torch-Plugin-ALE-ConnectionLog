@@ -12,163 +12,13 @@ using Torch.Commands.Permissions;
 using Torch.Mod;
 using Torch.Mod.Messages;
 using VRage.Game.ModAPI;
+using static ALE_ConnectionLog.Utilities;
 
 namespace ALE_ConnectionLog {
     [Category("connectlog")]
     public class ConnectionLogCommands : CommandModule {
 
         public ConnectionLogPlugin Plugin => (ConnectionLogPlugin)Context.Plugin;
-
-        [Command("admin save", "Saves the log immediately.")]
-        [Permission(MyPromoteLevel.Admin)]
-        public void Save() {
-            Plugin.SaveLogEntriesAsync();
-            Context.Respond("Log saved!");
-        }
-
-        [Command("admin reload", "Reloads the file from file system.")]
-        [Permission(MyPromoteLevel.Owner)]
-        public void Reload() {
-
-            var steamId = new SteamIdCooldownKey(PlayerUtils.GetSteamId(Context.Player));
-
-            if (!CheckConformation(steamId, "reload"))
-                return;
-
-            Plugin.Reload();
-
-            var connectionLog = Plugin.LogEntries;
-            
-            LogEveryoneInAgain(connectionLog);
-
-            Context.Respond("Done!");
-        }
-
-        [Command("admin wipe all", "Deletes all Logs.")]
-        [Permission(MyPromoteLevel.Owner)]
-        public void Wipe() {
-
-            var steamId = new SteamIdCooldownKey(PlayerUtils.GetSteamId(Context.Player));
-
-            if (!CheckConformation(steamId, "wipe all"))
-                return;
-
-            var connectionLog = Plugin.LogEntries;
-            int countPlayers = connectionLog.GetPlayerCount();
-
-            connectionLog.Clear();
-
-            LogEveryoneInAgain(connectionLog);
-
-            Context.Respond("Deleted Logs for "+ countPlayers + " players!");
-        }
-
-        [Command("admin wipe sessions", "Deletes all Session Data (good if you want to keep playtime after server reset).")]
-        [Permission(MyPromoteLevel.Owner)]
-        public void CleanSessions() {
-
-            var steamId = new SteamIdCooldownKey(PlayerUtils.GetSteamId(Context.Player));
-
-            if (!CheckConformation(steamId, "wipe sessions"))
-                return;
-
-            var connectionLog = Plugin.LogEntries;
-            int countPlayers = connectionLog.GetPlayerCount();
-
-            connectionLog.ClearSessions();
-
-            LogEveryoneInAgain(connectionLog);
-
-            Context.Respond("Deleted Logs for " + countPlayers + " players!");
-        }
-
-        [Command("admin logoutall", "Logs all Players out.")]
-        [Permission(MyPromoteLevel.Admin)]
-        public void LogoutAll() {
-            Plugin.LogEveryoneOut();
-            Context.Respond("Done!");
-        }
-
-        [Command("admin open", "Finds all open Sessions.")]
-        [Permission(MyPromoteLevel.Owner)]
-        public void OpenSessions() {
-
-            StringBuilder sb = new StringBuilder();
-
-            var connectionLog = Plugin.LogEntries;
-
-            int count = 0;
-
-            foreach (var playerInfo in connectionLog.GetPlayerInfos()) {
-
-                foreach (var entry in playerInfo.GetEntries()) {
-
-                    if(entry.Logout == null) { 
-
-                        long identityId = MySession.Static.Players.TryGetIdentityId(playerInfo.SteamId);
-                        var identity = MySession.Static.Players.TryGetIdentity(identityId);
-
-                        sb.AppendLine(playerInfo.SteamId + " " + entry.Name);
-
-                        if (identity != null) {
-
-                            string faction = FactionUtils.GetPlayerFactionTag(identity.IdentityId);
-
-                            if (faction == "")
-                                sb.AppendLine("   #" + identity.IdentityId + "   " + identity.DisplayName);
-                            else
-                                sb.AppendLine("   #" + identity.IdentityId + "   " + identity.DisplayName + " [" + faction + "]");
-                        }
-
-                        sb.Append("   ");
-                        AddPlayTimeToSb(sb, entry);
-
-                        count++;
-                    }
-                }
-            }
-
-            sb.AppendLine();
-            sb.AppendLine("Found a total of "+count+" sessions!");
-
-            Respond(sb, "Open Sessions", "Sessions without Logout");
-        }
-
-        [Command("admin fix", "Fixes all open sessions that are not current.")]
-        [Permission(MyPromoteLevel.Owner)]
-        public void FixSessions() {
-
-            var steamId = new SteamIdCooldownKey(PlayerUtils.GetSteamId(Context.Player));
-
-            if (!CheckConformation(steamId, "fix"))
-                return;
-
-            var connectionLog = Plugin.LogEntries;
-
-            int count = 0;
-
-            foreach (var playerInfo in connectionLog.GetPlayerInfos()) {
-
-                var latestEntry = playerInfo.GetLatestEntry();
-
-                if (latestEntry == null)
-                    continue;
-
-                foreach (var entry in playerInfo.GetEntries()) {
-
-                    /* skip current */
-                    if (entry == latestEntry)
-                        continue;
-
-                    if (entry.Logout == null) {
-                        entry.ForceLogout();
-                        count++;
-                    }
-                }
-            }
-
-            Context.Respond("Fixed "+ count+ " sessions.");
-        }
 
         [Command("top", "Lists all players ordered by playtime.")]
         [Permission(MyPromoteLevel.Moderator)]
@@ -234,7 +84,7 @@ namespace ALE_ConnectionLog {
                 sb.AppendLine(FormatTime(entry.Value) + " " + key.SteamId + " " + name + " " + lastSeen.ToString("yyyy-MM-dd  HH:mm:ss"));
             }
 
-            Respond(sb, "Top Playtime", "Shows "+ top +" players");
+            Utilities.Respond(sb, "Top Playtime", "Shows "+ top +" players", Context);
         }
 
         [Command("playtime", "Outputs the total Playtimes of the specified player.")]
@@ -269,7 +119,7 @@ namespace ALE_ConnectionLog {
                 AddPlayTimeToSb(sb, entry);
             }
 
-            Respond(sb, "Playtime", "Player " + playerParam.Value.Name);
+            Utilities.Respond(sb, "Playtime", "Player " + playerParam.Value.Name, Context);
         }
 
         [Command("ips", "Shows all known IPs of the Player.")]
@@ -291,7 +141,7 @@ namespace ALE_ConnectionLog {
             foreach (var entry in playerInfo.GetEntries())
                 sb.AppendLine(entry.Name + " " + entry.IP +" "+ entry.GetLastDateTime().ToString("yyyy-MM-dd  HH:mm:ss"));
 
-            Respond(sb, "IPs", "Player " + playerParam.Value.Name);
+            Utilities.Respond(sb, "IPs", "Player " + playerParam.Value.Name, Context);
         }
 
         [Command("names", "Outputs all known names of the selected Player.")]
@@ -316,7 +166,7 @@ namespace ALE_ConnectionLog {
             foreach(var name in names)
             sb.AppendLine("--> "+name);
 
-            Respond(sb, "Playernames", "All known names of Player " + playerParam.Value.Name);
+            Utilities.Respond(sb, "Playernames", "All known names of Player " + playerParam.Value.Name, Context);
         }
 
         [Command("sessions", "Outputs the sessions of the specified player.")]
@@ -337,15 +187,15 @@ namespace ALE_ConnectionLog {
 
             var config = Plugin.Config;
 
-            AddLastSeenToSb(sb, playerParam.Value.SteamId);
+            Utilities.AddLastSeenToSb(sb, playerParam.Value.SteamId);
 
             sb.AppendLine("Last known data vs current");
             sb.AppendLine("--------------------------");
             sb.AppendLine("Name: " + playerInfo.LastName);
-            AddSessionToSb(sb, playerInfo.LastSeen, PlayerSnapshotFactory.Create(playerInfo.SteamId), "");
+            Utilities.AddSessionToSb(sb, playerInfo.LastSeen, PlayerSnapshotFactory.Create(playerInfo.SteamId), "");
             sb.AppendLine();
 
-            sb.AppendLine("Total playtime: " + FormatTime(playerInfo.TotalPlayTime));
+            sb.AppendLine("Total playtime: " + Utilities.FormatTime(playerInfo.TotalPlayTime));
             sb.AppendLine();
 
             sb.AppendLine("Sessions");
@@ -358,9 +208,9 @@ namespace ALE_ConnectionLog {
                 else 
                     sb.AppendLine(entry.Name);
 
-                AddPlayTimeToSb(sb, entry);
+                Utilities.AddPlayTimeToSb(sb, entry);
 
-                AddSessionToSb(sb, entry.Login, entry.Logout, "");
+                Utilities.AddSessionToSb(sb, entry.Login, entry.Logout, "");
 
                 if(entry.LogoutThroughSessionUnload)
                     sb.AppendLine("Logged off through Serverrestart");
@@ -368,7 +218,7 @@ namespace ALE_ConnectionLog {
                 sb.AppendLine();
             }
 
-            Respond(sb, "Session", "Player " + playerParam.Value.Name);
+            Utilities.Respond(sb, "Session", "Player " + playerParam.Value.Name, Context);
         }
 
         [Command("find", "Looks for the Data of a specific player by namePattern.")]
@@ -387,7 +237,7 @@ namespace ALE_ConnectionLog {
 
                 foreach(var knownName in playerInfo.GetNames()) {
 
-                    if(Matches(knownName, namePattern)) {
+                    if(Utilities.Matches(knownName, namePattern)) {
 
                         sb.AppendLine("Found Steam User: "+playerInfo.SteamId+" with name "+ knownName);
 
@@ -421,7 +271,7 @@ namespace ALE_ConnectionLog {
             sb.AppendLine();
             sb.AppendLine("Found a total of " + count + " matches!");
 
-            Respond(sb, "Found Players", "Players whose name matches case insensitive");
+            Utilities.Respond(sb, "Found Players", "Players whose name matches case insensitive", Context);
         }
 
         [Command("online date", "Outputs which players logged in at the same date.")]
@@ -475,7 +325,7 @@ namespace ALE_ConnectionLog {
                         }
 
                         sb.Append("   ");
-                        AddPlayTimeToSb(sb, entry);
+                        Utilities.AddPlayTimeToSb(sb, entry);
 
                         count++;
 
@@ -487,7 +337,7 @@ namespace ALE_ConnectionLog {
             sb.AppendLine();
             sb.AppendLine("Found a total of " + count + " unique players!");
 
-            Respond(sb, "Found Players", "Played on " + lookupDate.ToString("yyyy-MM-dd"));
+            Utilities.Respond(sb, "Found Players", "Played on " + lookupDate.ToString("yyyy-MM-dd"), Context);
         }
 
         [Command("online time", "Outputs which players logged in at the same date.")]
@@ -567,7 +417,7 @@ namespace ALE_ConnectionLog {
                         }
 
                         sb.Append("   ");
-                        AddPlayTimeToSb(sb, entry);
+                        Utilities.AddPlayTimeToSb(sb, entry);
 
                         count++;
 
@@ -579,7 +429,7 @@ namespace ALE_ConnectionLog {
             sb.AppendLine();
             sb.AppendLine("Found a total of " + count + " unique players!");
 
-            Respond(sb, "Found Players", "Played on " + lookupDate.ToString("yyyy-MM-dd HH:mm:ss"));
+            Utilities.Respond(sb, "Found Players", "Played on " + lookupDate.ToString("yyyy-MM-dd HH:mm:ss"), Context);
         }
 
         [Command("multis", "Outputs which Players had the same IP adress and when.")]
@@ -658,7 +508,7 @@ namespace ALE_ConnectionLog {
                 }
             }
 
-            Respond(sb, "Potential Multiaccounts", "Shows who shared IPs and when");
+            Utilities.Respond(sb, "Potential Multiaccounts", "Shows who shared IPs and when", Context);
         }
 
         [Command("sus", "Shows suspicious players, which have now much higher PCU than when they last logged in.")]
@@ -691,7 +541,7 @@ namespace ALE_ConnectionLog {
 
                     sb.AppendLine(playerInfo.SteamId + " " + playerInfo.LastName);
                     sb.AppendLine("   Last Seen: " + lastSeen.SnapshotTime.ToString("yyyy-MM-dd  HH:mm:ss"));
-                    sb.AppendLine("   Total Playtime: " + FormatTime(playerInfo.TotalPlayTime));
+                    sb.AppendLine("   Total Playtime: " + Utilities.FormatTime(playerInfo.TotalPlayTime));
 
                     sb.AppendLine("   Has no Identity anymore.");
                     sb.AppendLine();
@@ -722,7 +572,7 @@ namespace ALE_ConnectionLog {
                     sb.AppendLine(playerInfo.SteamId + " " + playerInfo.LastName);
 
                     sb.AppendLine("   Last Seen: " + lastSeenDate.ToString("yyyy-MM-dd  HH:mm:ss"));
-                    sb.AppendLine("   Total Playtime: " + FormatTime(playerInfo.TotalPlayTime));
+                    sb.AppendLine("   Total Playtime: " + Utilities.FormatTime(playerInfo.TotalPlayTime));
 
                     string faction = FactionUtils.GetPlayerFactionTag(identity.IdentityId);
 
@@ -741,194 +591,7 @@ namespace ALE_ConnectionLog {
             sb.AppendLine();
             sb.AppendLine("Found a total of " + count + " suspicious accounts!");
 
-            Respond(sb, "Suspicious Accounts", "Shows accounts who have higher PCU than when they were last seen.");
-        }
-
-        private static void AddSessionToSb(StringBuilder sb, PlayerSnapshot referenceSnapshot, PlayerSnapshot nowSnapshot, string prefix) {
-
-            if (nowSnapshot == null) {
-                
-                sb.AppendLine(prefix + "identity: " + referenceSnapshot.IdentityId);
-                sb.AppendLine(prefix + "faction: " + referenceSnapshot.Faction);
-                sb.AppendLine(prefix + "blocks: " + referenceSnapshot.BlockCount);
-                sb.AppendLine(prefix + "PCU: " + referenceSnapshot.PCU);
-                sb.AppendLine(prefix + "Grids: " + referenceSnapshot.GridCount);
-                
-                return;
-            }
-
-            if (referenceSnapshot.IdentityId != nowSnapshot.IdentityId)
-                sb.AppendLine(prefix + "Identity: " + referenceSnapshot.IdentityId + " -> " + nowSnapshot.IdentityId);
-            else
-                sb.AppendLine(prefix + "Identity: " + referenceSnapshot.IdentityId);
-
-            if (referenceSnapshot.Faction != nowSnapshot.Faction)
-                sb.AppendLine(prefix + "Faction: " + referenceSnapshot.Faction + " -> " + nowSnapshot.Faction);
-            else
-                sb.AppendLine(prefix + "Faction: " + referenceSnapshot.Faction);
-
-            if (referenceSnapshot.BlockCount != nowSnapshot.BlockCount)
-                sb.AppendLine(prefix + "Blocks: " + referenceSnapshot.BlockCount + " -> " + nowSnapshot.BlockCount);
-            else
-                sb.AppendLine(prefix + "Blocks: " + referenceSnapshot.BlockCount);
-
-            if (referenceSnapshot.PCU != nowSnapshot.PCU)
-                sb.AppendLine(prefix + "PCU: " + referenceSnapshot.PCU + " -> " + nowSnapshot.PCU);
-            else
-                sb.AppendLine(prefix + "PCU: " + referenceSnapshot.PCU);
-
-            if (referenceSnapshot.GridCount != nowSnapshot.GridCount)
-                sb.AppendLine(prefix + "Grids: " + referenceSnapshot.GridCount + " -> " + nowSnapshot.GridCount);
-            else
-                sb.AppendLine(prefix + "Grids: " + referenceSnapshot.GridCount);
-        }
-
-        private static void AddLastSeenToSb(StringBuilder sb, ulong steamId) {
-
-            long identityId = MySession.Static.Players.TryGetIdentityId(steamId);
-            var identity = MySession.Static.Players.TryGetIdentity(identityId);
-
-            if (identity == null)
-                return;
-
-            sb.AppendLine("Last Login: "+ identity.LastLoginTime.ToString("yyyy-MM-dd  HH:mm:ss"));
-            sb.AppendLine("Last Logout: " + identity.LastLoginTime.ToString("yyyy-MM-dd  HH:mm:ss"));
-            sb.AppendLine();
-        }
-
-        private static void AddPlayTimeToSb(StringBuilder sb, model.ConnectionPlayerInfo.ConnectionEntry entry) {
-            
-            string dateStringLogin = entry.Login.SnapshotTime.ToString("yyyy-MM-dd  HH:mm:ss");
-
-            sb.Append(dateStringLogin);
-
-            if (entry.Logout != null) {
-
-                string dateStringLogout = entry.Logout.SnapshotTime.ToString("yyyy-MM-dd HH:mm:ss");
-                int duration = entry.GetDurationMinutes();
-
-                sb.Append(" -> " + dateStringLogout + " -> ");
-                sb.Append(duration.ToString("0"));
-
-            } else {
-
-                sb.Append(" -> now -> ");
-                sb.Append((DateTime.Now - entry.Login.SnapshotTime).TotalMinutes.ToString("0"));
-            }
-
-            sb.AppendLine(" minutes");
-        }
-
-        public static string FormatTime(long timeInSeconds) {
-
-            long timeInMinutes = timeInSeconds / 60;
-
-            long hours = timeInMinutes / 60;
-            long minutes = timeInMinutes % 60;
-
-            if (hours == 0 && minutes == 0)
-                return "none";
-
-            string returnString = "";
-
-            if (hours > 0)
-                returnString += hours + "h ";
-
-            if(minutes > 0)
-                returnString += minutes + "m ";
-
-            return returnString;
-        }
-
-        public static bool Matches(string input, string pattern) {
-
-            var regex = WildCardToRegular(pattern);
-
-            return Regex.IsMatch(input.ToLower(), regex);
-        }
-
-        private static string WildCardToRegular(string value) {
-            return "^" + Regex.Escape(value).Replace("\\?", ".").Replace("\\*", ".*") + "$";
-        }
-
-        public void Respond(StringBuilder sb, string title, string subtitle) {
-
-            if (Context.Player == null) {
-
-                Context.Respond(title);
-                Context.Respond(subtitle);
-                Context.Respond(sb.ToString());
-
-            } else {
-
-                ModCommunication.SendMessageTo(new DialogMessage(title,
-                    subtitle, sb.ToString()), Context.Player.SteamUserId);
-            }
-        }
-
-        private bool CheckConformation(ICooldownKey cooldownKey, string command) {
-
-            var cooldownManager = Plugin.ConfirmationCooldownManager;
-
-            if (!cooldownManager.CheckCooldown(cooldownKey, command, out _)) {
-                cooldownManager.StopCooldown(cooldownKey);
-                return true;
-            }
-
-            cooldownManager.StartCooldown(cooldownKey, command, Plugin.CooldownConfirmation);
-
-            Context.Respond("Are you sure you want to continue? Enter the command again within " + Plugin.CooldownConfirmationSeconds + " seconds to confirm.");
-
-            return false;
-        }
-
-        private void LogEveryoneInAgain(ConnectionLog connectionLog) {
-
-            /* Now log everyone that is online in again */
-
-            var result = new List<MyPlayer>(MySession.Static.Players.GetOnlinePlayers()
-                .Where(x => x.IsRealPlayer && !string.IsNullOrEmpty(x.DisplayName)));
-
-            foreach (MyPlayer player in result) {
-
-                var Identity = player.Identity;
-                ulong SteamId = MySession.Static.Players.TryGetSteamId(Identity.IdentityId);
-                string ip = Plugin.GetIpOfSteamId(SteamId);
-
-                connectionLog.LoginPlayer(SteamId, player.DisplayName, ip, Plugin.Config);
-            }
-        }
-
-        private PlayerParam? FindPlayerParam(string nameIdOrSteamId) {
-
-            MyIdentity identity = PlayerUtils.GetIdentityByNameOrId(nameIdOrSteamId);
-
-            ulong steamId;
-
-            if (identity != null) {
-
-                steamId = MySession.Static.Players.TryGetSteamId(identity.IdentityId);
-
-                return new PlayerParam(identity.DisplayName, steamId);
-            }
-
-            if (ulong.TryParse(nameIdOrSteamId, out steamId)) {
-
-                return new PlayerParam(steamId.ToString(), steamId);
-            }
-
-            return null;
-        }
-
-        private struct PlayerParam {
-            
-            public string Name;
-            public ulong SteamId;
-
-            public PlayerParam(string name, ulong steamId) {
-                Name = name;
-                SteamId = steamId;
-            }
+            Utilities.Respond(sb, "Suspicious Accounts", "Shows accounts who have higher PCU than when they were last seen.", Context);
         }
     }
 }
