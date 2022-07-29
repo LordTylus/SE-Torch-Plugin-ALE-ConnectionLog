@@ -148,6 +148,39 @@ namespace ALE_ConnectionLog {
             Context.Respond("Fixed "+ count+ " sessions.");
         }
 
+        [Command("top", "Lists all players ordered by playtime.")]
+        [Permission(MyPromoteLevel.Moderator)]
+        public void Top(int top = 10) {
+
+            StringBuilder sb = new StringBuilder();
+
+            var connectionLog = Plugin.LogEntries;
+
+            Dictionary<ConnectionPlayerInfo, long> playerDictionary = new Dictionary<ConnectionPlayerInfo, long>();
+
+            foreach (var playerInfo in connectionLog.GetPlayerInfos())
+                playerDictionary[playerInfo] = playerInfo.TotalPlayTime;
+
+            var playerList = playerDictionary.ToList();
+
+            playerList.Sort((o1, o2) => {
+                return o2.Value.CompareTo(o1.Value);
+            });
+
+            if (top > playerList.Count)
+                top = playerList.Count;
+
+            for (int i = 0; i < top; i++) {
+
+                var entry = playerList[i];
+                var key = entry.Key;
+
+                sb.AppendLine(entry.Value + " " + key.SteamId + " " + key.LastName + " " + key.LastSeen);
+            }
+
+            Respond(sb, "Top Playtime", "Shows "+ top +" players");
+        }
+
         [Command("playtime", "Outputs the total Playtimes of the specified player.")]
         [Permission(MyPromoteLevel.Moderator)]
         public void PlayTime(string nameIdOrSteamId) {
@@ -172,7 +205,7 @@ namespace ALE_ConnectionLog {
             AddSessionToSb(sb, playerInfo.LastSeen, PlayerSnapshotFactory.Create(playerInfo.SteamId), "");
             sb.AppendLine();
 
-            sb.AppendLine("Total play time: " + (int)(playerInfo.TotalPlayTime / 60) + " minutes.");
+            sb.AppendLine("Total playtime: " + (int)(playerInfo.TotalPlayTime / 60) + " minutes.");
             sb.AppendLine("--------------------------");
             sb.AppendLine();
 
@@ -180,7 +213,7 @@ namespace ALE_ConnectionLog {
                 AddPlayTimeToSb(sb, entry);
             }
 
-            Respond(sb, "Play Time", "Player " + playerParam.Value.Name);
+            Respond(sb, "Playtime", "Player " + playerParam.Value.Name);
         }
 
         [Command("ips", "Shows all known IPs of the Player.")]
