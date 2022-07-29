@@ -154,7 +154,7 @@ namespace ALE_ConnectionLog {
 
             PlayerParam? playerParam = FindPlayerParam(nameIdOrSteamId);
 
-            if(!playerParam.HasValue) {
+            if (!playerParam.HasValue) {
                 Context.Respond("Player not found!");
                 return;
             }
@@ -166,15 +166,13 @@ namespace ALE_ConnectionLog {
             var connectionLog = Plugin.LogEntries;
             var playerInfo = connectionLog.GetInfoForPlayer(playerParam.Value.SteamId);
 
-            sb.AppendLine("Identity: " + playerInfo.LastSeen.IdentityId);
-            sb.AppendLine("Last Name: " + playerInfo.LastName);
-            sb.AppendLine("Faction: " + playerInfo.LastSeen.Faction);
-            sb.AppendLine("Blocks: " + playerInfo.LastSeen.BlockCount);
-            sb.AppendLine("PCU: " + playerInfo.LastSeen.PCU);
-            sb.AppendLine("Grids: " + playerInfo.LastSeen.GridCount);
+            sb.AppendLine("Last known data vs current");
+            sb.AppendLine("--------------------------");
+            sb.AppendLine("Name: " + playerInfo.LastName);
+            AddSessionToSb(sb, playerInfo.LastSeen, PlayerSnapshotFactory.Create(playerInfo.SteamId), "");
             sb.AppendLine();
 
-            sb.AppendLine("Total play time: " + (int) (playerInfo.TotalPlayTime/60) +" minutes.");
+            sb.AppendLine("Total play time: " + (int)(playerInfo.TotalPlayTime / 60) + " minutes.");
             sb.AppendLine("--------------------------");
             sb.AppendLine();
 
@@ -252,12 +250,12 @@ namespace ALE_ConnectionLog {
 
             AddLastSeenToSb(sb, playerParam.Value.SteamId);
 
-            sb.AppendLine("Identity: " + playerInfo.LastSeen.IdentityId);
-            sb.AppendLine("Last Name: " + playerInfo.LastName);
-            sb.AppendLine("Faction: " + playerInfo.LastSeen.Faction);
-            sb.AppendLine("Blocks: " + playerInfo.LastSeen.BlockCount);
-            sb.AppendLine("PCU: " + playerInfo.LastSeen.PCU);
-            sb.AppendLine("Grids: " + playerInfo.LastSeen.GridCount);
+            sb.AppendLine("Last known data vs current");
+            sb.AppendLine("--------------------------");
+            sb.AppendLine("Name: " + playerInfo.LastName);
+            AddSessionToSb(sb, playerInfo.LastSeen, PlayerSnapshotFactory.Create(playerInfo.SteamId), "");
+            sb.AppendLine();
+
             sb.AppendLine();
             sb.AppendLine("Sessions");
             sb.AppendLine("--------------------------");
@@ -270,42 +268,8 @@ namespace ALE_ConnectionLog {
                     sb.AppendLine(entry.Name);
 
                 AddPlayTimeToSb(sb, entry);
-                
-                if(entry.Logout == null) {
 
-                    sb.AppendLine("Identity: " + entry.Login.IdentityId);
-                    sb.AppendLine("Faction: " + entry.Login.Faction);
-                    sb.AppendLine("Blocks: " + entry.Login.BlockCount);
-                    sb.AppendLine("PCU: " + entry.Login.PCU);
-                    sb.AppendLine("Grids: " + entry.Login.GridCount);
-
-                } else {
-
-                    if(entry.Login.IdentityId != entry.Logout.IdentityId)
-                        sb.AppendLine("Identity: " + entry.Login.IdentityId + " -> " + entry.Logout.IdentityId);
-                    else
-                        sb.AppendLine("Identity: " + entry.Login.IdentityId);
-
-                    if (entry.Login.Faction != entry.Logout.Faction)
-                        sb.AppendLine("Faction: " + entry.Login.Faction + " -> " + entry.Logout.Faction);
-                    else
-                        sb.AppendLine("Faction: " + entry.Login.Faction);
-
-                    if (entry.Login.BlockCount != entry.Logout.BlockCount)
-                        sb.AppendLine("Blocks: " + entry.Login.BlockCount + " -> " + entry.Logout.BlockCount);
-                    else
-                        sb.AppendLine("Blocks: " + entry.Login.BlockCount);
-
-                    if (entry.Login.PCU != entry.Logout.PCU)
-                        sb.AppendLine("PCU: " + entry.Login.PCU + " -> " + entry.Logout.PCU);
-                    else
-                        sb.AppendLine("PCU: " + entry.Login.PCU);
-
-                    if (entry.Login.GridCount != entry.Logout.GridCount)
-                        sb.AppendLine("Grids: " + entry.Login.GridCount + " -> " + entry.Logout.GridCount);
-                    else
-                        sb.AppendLine("Grids: " + entry.Login.GridCount);
-                }
+                AddSessionToSb(sb, entry.Login, entry.Logout, "");
 
                 if(entry.LogoutThroughSessionUnload)
                     sb.AppendLine("Logged off through Serverrestart");
@@ -687,6 +651,45 @@ namespace ALE_ConnectionLog {
             sb.AppendLine("Found a total of " + count + " suspicious accounts!");
 
             Respond(sb, "Suspicious Accounts", "Shows accounts who have higher PCU than when they were last seen.");
+        }
+
+        private static void AddSessionToSb(StringBuilder sb, PlayerSnapshot referenceSnapshot, PlayerSnapshot nowSnapshot, string prefix) {
+
+            if (nowSnapshot == null) {
+                
+                sb.AppendLine(prefix + "identity: " + referenceSnapshot.IdentityId);
+                sb.AppendLine(prefix + "faction: " + referenceSnapshot.Faction);
+                sb.AppendLine(prefix + "blocks: " + referenceSnapshot.BlockCount);
+                sb.AppendLine(prefix + "PCU: " + referenceSnapshot.PCU);
+                sb.AppendLine(prefix + "Grids: " + referenceSnapshot.GridCount);
+                
+                return;
+            }
+
+            if (referenceSnapshot.IdentityId != nowSnapshot.IdentityId)
+                sb.AppendLine(prefix + "Identity: " + referenceSnapshot.IdentityId + " -> " + nowSnapshot.IdentityId);
+            else
+                sb.AppendLine(prefix + "Identity: " + referenceSnapshot.IdentityId);
+
+            if (referenceSnapshot.Faction != nowSnapshot.Faction)
+                sb.AppendLine(prefix + "Faction: " + referenceSnapshot.Faction + " -> " + nowSnapshot.Faction);
+            else
+                sb.AppendLine(prefix + "Faction: " + referenceSnapshot.Faction);
+
+            if (referenceSnapshot.BlockCount != nowSnapshot.BlockCount)
+                sb.AppendLine(prefix + "Blocks: " + referenceSnapshot.BlockCount + " -> " + nowSnapshot.BlockCount);
+            else
+                sb.AppendLine(prefix + "Blocks: " + referenceSnapshot.BlockCount);
+
+            if (referenceSnapshot.PCU != nowSnapshot.PCU)
+                sb.AppendLine(prefix + "PCU: " + referenceSnapshot.PCU + " -> " + nowSnapshot.PCU);
+            else
+                sb.AppendLine(prefix + "PCU: " + referenceSnapshot.PCU);
+
+            if (referenceSnapshot.GridCount != nowSnapshot.GridCount)
+                sb.AppendLine(prefix + "Grids: " + referenceSnapshot.GridCount + " -> " + nowSnapshot.GridCount);
+            else
+                sb.AppendLine(prefix + "Grids: " + referenceSnapshot.GridCount);
         }
 
         private static void AddLastSeenToSb(StringBuilder sb, ulong steamId) {
