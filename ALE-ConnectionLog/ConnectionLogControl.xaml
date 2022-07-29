@@ -42,6 +42,7 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <TextBlock Grid.Column="0" Grid.Row ="0" VerticalAlignment="Center" Text="ALE-ConnectionLog" FontWeight="Bold" FontSize="16" Grid.ColumnSpan="2" Margin="5"/>
@@ -105,5 +106,8 @@
         <TextBlock Grid.Column="1" Grid.Row ="24" VerticalAlignment="Top" Grid.ColumnSpan="2" TextWrapping="Wrap" Text="Displays Players that connected on the given date." Margin="5"/>
         <TextBlock Grid.Column="0" Grid.Row ="25" VerticalAlignment="Top" Text="!connectlog online time [h=-1] [m=-1] [s=-1] [day=0] [month=0] [year=0]" Margin="5" />
         <TextBlock Grid.Column="1" Grid.Row ="25" VerticalAlignment="Top" Grid.ColumnSpan="2" TextWrapping="Wrap" Text="Displays Players that were online at the given date and time." Margin="5"/>
+
+        <TextBlock Grid.Column="0" Grid.Row ="26" VerticalAlignment="Top" Text="!connectlog [showIP=false]" Margin="5" />
+        <TextBlock Grid.Column="1" Grid.Row ="26" VerticalAlignment="Top" Grid.ColumnSpan="2" TextWrapping="Wrap" Text="Displays playtime and for executing player (ip is optional)." Margin="5"/>
     </Grid>
 </UserControl>

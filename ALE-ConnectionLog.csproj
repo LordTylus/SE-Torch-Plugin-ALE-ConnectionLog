@@ -152,6 +152,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ALE-ConnectionLog\ConnectionLogAdminCommands.cs" />
+    <Compile Include="ALE-ConnectionLog\ConnectionLogPlayerCommands.cs" />
     <Compile Include="ALE-ConnectionLog\Utilities.cs" />
     <Compile Include="ALE-ConnectionLog\ConnectionLogManager.cs" />
     <Compile Include="ALE-ConnectionLog\model\ConnectionPlayerInfo.cs" />

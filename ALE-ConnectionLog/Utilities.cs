@@ -1,17 +1,12 @@
 ﻿using ALE_ConnectionLog.model;
-using ALE_Core.Cooldown;
 using ALE_Core.Utils;
 using Sandbox.Game.World;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using Torch.Commands;
-using Torch.Commands.Permissions;
 using Torch.Mod;
 using Torch.Mod.Messages;
-using VRage.Game.ModAPI;
 
 namespace ALE_ConnectionLog {
 
@@ -69,9 +64,12 @@ namespace ALE_ConnectionLog {
             sb.AppendLine();
         }
 
-        public static void AddPlayTimeToSb(StringBuilder sb, model.ConnectionPlayerInfo.ConnectionEntry entry) {
+        public static void AddPlayTimeToSb(StringBuilder sb, ConnectionPlayerInfo.ConnectionEntry entry, bool showIP = false) {
             
             string dateStringLogin = entry.Login.SnapshotTime.ToString("yyyy-MM-dd  HH:mm:ss");
+
+            if(showIP)
+                sb.Append(entry.IP+"   ");
 
             sb.Append(dateStringLogin);
 
