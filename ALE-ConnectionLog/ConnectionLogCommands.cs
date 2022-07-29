@@ -12,7 +12,6 @@ using Torch.Commands.Permissions;
 using Torch.Mod;
 using Torch.Mod.Messages;
 using VRage.Game.ModAPI;
-using static ALE_ConnectionLog.Utilities;
 
 namespace ALE_ConnectionLog {
     [Category("connectlog")]
@@ -81,7 +80,7 @@ namespace ALE_ConnectionLog {
                     lastSeen = key.LastSeen.SnapshotTime;
                 }
 
-                sb.AppendLine(FormatTime(entry.Value) + " " + key.SteamId + " " + name + " " + lastSeen.ToString("yyyy-MM-dd  HH:mm:ss"));
+                sb.AppendLine(Utilities.FormatTime(entry.Value) + " " + key.SteamId + " " + name + " " + lastSeen.ToString("yyyy-MM-dd  HH:mm:ss"));
             }
 
             Utilities.Respond(sb, "Top Playtime", "Shows "+ top +" players", Context);
@@ -91,7 +90,7 @@ namespace ALE_ConnectionLog {
         [Permission(MyPromoteLevel.Moderator)]
         public void PlayTime(string nameIdOrSteamId) {
 
-            PlayerParam? playerParam = FindPlayerParam(nameIdOrSteamId);
+            Utilities.PlayerParam? playerParam = Utilities.FindPlayerParam(nameIdOrSteamId);
 
             if (!playerParam.HasValue) {
                 Context.Respond("Player not found!");
@@ -100,7 +99,7 @@ namespace ALE_ConnectionLog {
 
             StringBuilder sb = new StringBuilder();
 
-            AddLastSeenToSb(sb, playerParam.Value.SteamId);
+            Utilities.AddLastSeenToSb(sb, playerParam.Value.SteamId);
 
             var connectionLog = Plugin.LogEntries;
             var playerInfo = connectionLog.GetInfoForPlayer(playerParam.Value.SteamId);
@@ -108,15 +107,15 @@ namespace ALE_ConnectionLog {
             sb.AppendLine("Last known data vs current");
             sb.AppendLine("--------------------------");
             sb.AppendLine("Name: " + playerInfo.LastName);
-            AddSessionToSb(sb, playerInfo.LastSeen, PlayerSnapshotFactory.Create(playerInfo.SteamId), "");
+            Utilities.AddSessionToSb(sb, playerInfo.LastSeen, PlayerSnapshotFactory.Create(playerInfo.SteamId), "");
             sb.AppendLine();
 
-            sb.AppendLine("Total playtime: " + FormatTime(playerInfo.TotalPlayTime));
+            sb.AppendLine("Total playtime: " + Utilities.FormatTime(playerInfo.TotalPlayTime));
             sb.AppendLine("--------------------------");
             sb.AppendLine();
 
             foreach (var entry in playerInfo.GetEntries()) {
-                AddPlayTimeToSb(sb, entry);
+                Utilities.AddPlayTimeToSb(sb, entry);
             }
 
             Utilities.Respond(sb, "Playtime", "Player " + playerParam.Value.Name, Context);
@@ -126,7 +125,7 @@ namespace ALE_ConnectionLog {
         [Permission(MyPromoteLevel.Admin)]
         public void IPs(string nameIdOrSteamId) {
 
-            PlayerParam? playerParam = FindPlayerParam(nameIdOrSteamId);
+            Utilities.PlayerParam? playerParam = Utilities.FindPlayerParam(nameIdOrSteamId);
 
             if (!playerParam.HasValue) {
                 Context.Respond("Player not found!");
@@ -148,7 +147,7 @@ namespace ALE_ConnectionLog {
         [Permission(MyPromoteLevel.Moderator)]
         public void Names(string nameIdOrSteamId) {
 
-            PlayerParam? playerParam = FindPlayerParam(nameIdOrSteamId);
+            Utilities.PlayerParam? playerParam = Utilities.FindPlayerParam(nameIdOrSteamId);
 
             if (!playerParam.HasValue) {
                 Context.Respond("Player not found!");
@@ -173,7 +172,7 @@ namespace ALE_ConnectionLog {
         [Permission(MyPromoteLevel.Moderator)]
         public void Sessions(string nameIdOrSteamId) {
 
-            PlayerParam? playerParam = FindPlayerParam(nameIdOrSteamId);
+            Utilities.PlayerParam? playerParam = Utilities.FindPlayerParam(nameIdOrSteamId);
 
             if (!playerParam.HasValue) {
                 Context.Respond("Player not found!");
