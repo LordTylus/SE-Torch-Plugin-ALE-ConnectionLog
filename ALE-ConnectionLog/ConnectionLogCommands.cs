@@ -66,7 +66,7 @@ namespace ALE_ConnectionLog {
                     lastSeen = key.LastSeen.SnapshotTime;
                 }
 
-                sb.AppendLine(Utilities.FormatTime(entry.Value) + " " + key.SteamId + " " + name + " " + lastSeen.ToString("yyyy-MM-dd  HH:mm:ss"));
+                sb.AppendLine((i+1) +".   "+ Utilities.FormatTime(entry.Value) + "   " + key.SteamId + " " + name + " " + lastSeen.ToString("yyyy-MM-dd  HH:mm:ss"));
             }
 
             Utilities.Respond(sb, "Top Playtime", "Shows "+ top +" players", Context);
