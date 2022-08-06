@@ -18,6 +18,12 @@ namespace ALE_ConnectionLog {
         [Command("top", "Lists all players ordered by playtime in this world.")]
         [Permission(MyPromoteLevel.Moderator)]
         public void Top(int top = 10) {
+            TopWorld(top);
+        }
+
+        [Command("top world", "Lists all players ordered by playtime in this world.")]
+        [Permission(MyPromoteLevel.Moderator)]
+        public void TopWorld(int top = 10) {
 
             StringBuilder sb = new StringBuilder();
 
