@@ -177,11 +177,7 @@ namespace ALE_ConnectionLog {
                 }
 
                 infoForPlayer.TotalPlayTime = logDto.TPT;
-
-                if(logDto.WPT < 0)
-                    infoForPlayer.WorldPlayTime = logDto.TPT;
-                else
-                    infoForPlayer.WorldPlayTime = logDto.WPT;
+                infoForPlayer.WorldPlayTime = logDto.WPT;
 
                 if (logDto.LN != null)
                     infoForPlayer.LastName = logDto.LN;

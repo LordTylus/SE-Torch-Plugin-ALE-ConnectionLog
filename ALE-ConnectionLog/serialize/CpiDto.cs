@@ -9,7 +9,7 @@ namespace ALE_ConnectionLog.serialize {
     public class CpiDto : ViewModel {
         public ulong SID { get; set; }
         public long TPT { get; set; } = 0;
-        public long WPT { get; set; } = -1;
+        public long WPT { get; set; } = 0;
 
         public string LN { get; set; }
 
