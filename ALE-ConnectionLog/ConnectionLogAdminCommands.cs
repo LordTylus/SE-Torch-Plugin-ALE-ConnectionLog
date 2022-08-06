@@ -65,7 +65,7 @@ namespace ALE_ConnectionLog {
 
             var steamId = new SteamIdCooldownKey(PlayerUtils.GetSteamId(Context.Player));
 
-            if (!CheckConformation(steamId, "wipe sessions"))
+            if (!CheckConformation(steamId, "wipe world"))
                 return;
 
             var connectionLog = Plugin.LogEntries;
