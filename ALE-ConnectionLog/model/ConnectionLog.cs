@@ -1,9 +1,6 @@
 ﻿using NLog;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Collections.Specialized;
-using Torch;
 using static ALE_ConnectionLog.model.ConnectionPlayerInfo;
 
 namespace ALE_ConnectionLog.model {
@@ -31,6 +28,11 @@ namespace ALE_ConnectionLog.model {
         internal void ClearSessions() {
             foreach (var playerInfo in _playerInfos.Values)
                 playerInfo.ClearSessions();
+        }
+
+        internal void ClearWorld() {
+            foreach (var playerInfo in _playerInfos.Values)
+                playerInfo.ClearWorld();
         }
 
         public ConnectionPlayerInfo GetInfoForPlayer(ulong steamId) {

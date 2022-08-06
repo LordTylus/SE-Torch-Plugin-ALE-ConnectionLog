@@ -34,6 +34,7 @@ namespace ALE_ConnectionLog {
             sb.AppendLine();
 
             sb.AppendLine("Total playtime: " + Utilities.FormatTime(Utilities.CalcTotalPlayTime(playerInfo)));
+            sb.AppendLine("World playtime: " + Utilities.FormatTime(Utilities.CalcWorldPlayTime(playerInfo)));
             sb.AppendLine("--------------------------");
             sb.AppendLine();
 

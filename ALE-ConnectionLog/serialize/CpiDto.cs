@@ -9,11 +9,10 @@ namespace ALE_ConnectionLog.serialize {
     public class CpiDto : ViewModel {
         public ulong SID { get; set; }
         public long TPT { get; set; } = 0;
+        public long WPT { get; set; } = -1;
 
         public string LN { get; set; }
 
-        [Obsolete("Use LPS instead. LS is just for conversion/backwards compatibility.")]
-        public DateTime LS { get; set; }
         public PsDto LPS { get; set; }
 
         private HashSet<string> _allKnownNames = new HashSet<string>();

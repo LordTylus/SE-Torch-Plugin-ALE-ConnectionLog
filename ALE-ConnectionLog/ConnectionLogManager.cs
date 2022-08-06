@@ -102,8 +102,9 @@ namespace ALE_ConnectionLog {
                 }
                 
                 cpiDto.TPT = connectionPlayerInfo.TotalPlayTime;
+                cpiDto.WPT = connectionPlayerInfo.WorldPlayTime;
 
-                foreach(var entry in connectionPlayerInfo.GetEntries()) {
+                foreach (var entry in connectionPlayerInfo.GetEntries()) {
 
                     CeDto ceDto = new CeDto();
 
@@ -172,13 +173,15 @@ namespace ALE_ConnectionLog {
                 
                 } else {
 
-                    if (logDto.LS != null)
-                        infoForPlayer.LastSeen = PlayerSnapshotFactory.CreateEmpty(logDto.LS);
-                    else
-                        infoForPlayer.LastSeen = PlayerSnapshotFactory.CreateEmpty();
+                    infoForPlayer.LastSeen = PlayerSnapshotFactory.CreateEmpty();
                 }
 
                 infoForPlayer.TotalPlayTime = logDto.TPT;
+
+                if(logDto.WPT < 0)
+                    infoForPlayer.WorldPlayTime = logDto.TPT;
+                else
+                    infoForPlayer.WorldPlayTime = logDto.WPT;
 
                 if (logDto.LN != null)
                     infoForPlayer.LastName = logDto.LN;

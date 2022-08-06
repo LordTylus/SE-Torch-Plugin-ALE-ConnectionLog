@@ -15,6 +15,7 @@ namespace ALE_ConnectionLog.model {
         public PlayerSnapshot LastSeen { get; set; } = PlayerSnapshotFactory.CreateEmpty();
 
         public long TotalPlayTime { get; set; }
+        public long WorldPlayTime { get; set; }
 
         private MyConcurrentHashSet<string> _allKnownNames = new MyConcurrentHashSet<string>();
         private MyConcurrentList<ConnectionEntry> _connectionEntries = new MyConcurrentList<ConnectionEntry>();
@@ -25,6 +26,14 @@ namespace ALE_ConnectionLog.model {
 
         internal void ClearSessions() {
             _connectionEntries.Clear();
+        }
+
+        internal void ClearWorld() {
+
+            ClearSessions();
+
+            WorldPlayTime = 0;
+            LastSeen = PlayerSnapshotFactory.CreateEmpty();
         }
 
         internal void Login(string name, string ip, ConnectionLogConfig config) {
@@ -71,10 +80,18 @@ namespace ALE_ConnectionLog.model {
             if (entry.Login != null) {
 
                 /* If logout it called twice make sure to fix the numbers */
-                if (entry.Logout != null)
-                    TotalPlayTime -= (long)(entry.Logout.SnapshotTime - entry.Login.SnapshotTime).TotalSeconds;
+                if (entry.Logout != null) {
 
-                TotalPlayTime += (long)(snapshot.SnapshotTime - entry.Login.SnapshotTime).TotalSeconds;
+                    long playedSecondsOld = (long)(entry.Logout.SnapshotTime - entry.Login.SnapshotTime).TotalSeconds;
+
+                    TotalPlayTime -= playedSecondsOld;
+                    WorldPlayTime -= playedSecondsOld;
+                }
+
+                long playedSeconds = (long)(snapshot.SnapshotTime - entry.Login.SnapshotTime).TotalSeconds;
+
+                TotalPlayTime += playedSeconds;
+                WorldPlayTime += playedSeconds;
             }
 
             LastSeen = snapshot;

@@ -59,7 +59,26 @@ namespace ALE_ConnectionLog {
             Context.Respond("Deleted Logs for "+ countPlayers + " players!");
         }
 
-        [Command("wipe sessions", "Deletes all Session Data (good if you want to keep playtime after server reset).")]
+        [Command("wipe world", "Deletes all Session and World Data (Keeps Total Playtime after server reset).")]
+        [Permission(MyPromoteLevel.Owner)]
+        public void CleanWorld() {
+
+            var steamId = new SteamIdCooldownKey(PlayerUtils.GetSteamId(Context.Player));
+
+            if (!CheckConformation(steamId, "wipe sessions"))
+                return;
+
+            var connectionLog = Plugin.LogEntries;
+            int countPlayers = connectionLog.GetPlayerCount();
+
+            connectionLog.ClearWorld();
+
+            LogEveryoneInAgain(connectionLog);
+
+            Context.Respond("Deleted Sessions for " + countPlayers + " players!");
+        }
+
+        [Command("wipe sessions", "Deletes all Session Data (you will keep last login information and playtimes).")]
         [Permission(MyPromoteLevel.Owner)]
         public void CleanSessions() {
 
