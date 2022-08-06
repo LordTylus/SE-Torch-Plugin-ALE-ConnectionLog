@@ -121,6 +121,7 @@ namespace ALE_ConnectionLog {
                     networking = MySteamGameService_Networking.Value;
 
                     LogEntries.CloseMemorizedSessions();
+                    _connectionLogManager.SaveLogEntriesSync(LogEntries, Config);
 
                     Log.Info("Session Loaded!");
                     break;
