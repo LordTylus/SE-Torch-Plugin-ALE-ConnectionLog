@@ -146,7 +146,9 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="VRage.Steam">
-      <HintPath>GameBinaries\VRage.Steam.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+	  <HintPath>GameBinaries\VRage.Steam.dll</HintPath>
+	  <Private>False</Private>
     </Reference>
     <Reference Include="WindowsBase" />
   </ItemGroup>
