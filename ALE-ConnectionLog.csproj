@@ -203,7 +203,7 @@
     <Resource Include=".gitignore" />
     <Resource Include="Setup (run before opening plugin).bat" />
   </ItemGroup>
-  <Import Project="ALE-Core\ALE-Core.projitems" Label="Shared" />
+  <Import Project="..\ALE-Core\ALE-Core.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
     <Content Include="manifest.xml" CopyToOutputDirectory="PreserveNewest" />
